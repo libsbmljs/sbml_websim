@@ -32,5 +32,9 @@
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1",
     "webpack-dev-server": "^3.3.1"
+  },
+  "dependencies": {
+    "libsbmljs_stable": "^5.18.0-beta1",
+    "odex": "^2.0.4"
   }
 }
