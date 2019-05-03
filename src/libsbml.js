@@ -8,10 +8,6 @@ export const libsbml_promise = new Promise((resolve, reject) => {
   })
 })
 
-// export function getLibsbml() {
-//   return libsbml
-// }
-
 export function getLibsbmlReader() {
   return new libsbml.SBMLReader()
 }
