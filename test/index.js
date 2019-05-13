@@ -22,7 +22,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
 describe('Loading', function () {
   it('Loads an SBML file', (done) => {
-    expect("Hello".length).toEqual(5);
+    expect("Hello".length).toEqual(5)
     done()
   })
 })

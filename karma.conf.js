@@ -72,21 +72,21 @@ module.exports = function(config) {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'src/index.js': ['webpack', 'sourcemap'],
-      'test/index.js': ['babel'],
+      'test/index.js': ['webpack'],
     },
 
-    babelPreprocessor: {
-      options: {
-        presets: ['@babel/preset-env'],
-        sourceMap: 'inline'
-      },
-      filename: function (file) {
-        return file.originalPath.replace(/\.js$/, '.es5.js');
-      },
-      sourceFileName: function (file) {
-        return file.originalPath;
-      }
-    },
+    // babelPreprocessor: {
+    //   options: {
+    //     presets: ['@babel/preset-env'],
+    //     sourceMap: 'inline'
+    //   },
+    //   filename: function (file) {
+    //     return file.originalPath.replace(/\.js$/, '.es5.js');
+    //   },
+    //   sourceFileName: function (file) {
+    //     return file.originalPath;
+    //   }
+    // },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -123,7 +123,7 @@ module.exports = function(config) {
       // ('karma-chrome-launcher')
       ('karma-firefox-launcher'),
       ('karma-sourcemap-loader'),
-      ('karma-babel-preprocessor'),
+      // ('karma-babel-preprocessor'),
     ]
   });
 };
