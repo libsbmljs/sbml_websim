@@ -7,6 +7,8 @@
 
 // https://stackoverflow.com/questions/22421857/error-no-provider-for-frameworkjasmine-resolving-frameworkjasmine
 
+// https://mike-ward.net/2015/09/07/tips-on-setting-up-karma-testing-with-webpack/
+
 var path = require('path');
 const webpack = require('webpack');
 // var entry = path.resolve(webpackConfig.context, webpackConfig.entry);
@@ -32,13 +34,13 @@ module.exports = function(config) {
     files: [
       {pattern: wasm_dir+'/libsbml.wasm', watched: false, served: true, included: false, type: 'wasm'},
       {pattern: '../models/*.xml', watched: false, served: true, included: false},
-      'src/index.js'
+      'test/index.js'
     ],
 
     webpack: {
       mode: 'development',
       resolve: {
-        modules: ['build','node_modules']
+        modules: ['node_modules']
       },
       module: {
         rules: [
@@ -69,7 +71,21 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'src/index.js': ['webpack', 'sourcemap']
+      'src/index.js': ['webpack', 'sourcemap'],
+      'test/index.js': ['babel'],
+    },
+
+    babelPreprocessor: {
+      options: {
+        presets: ['@babel/preset-env'],
+        sourceMap: 'inline'
+      },
+      filename: function (file) {
+        return file.originalPath.replace(/\.js$/, '.es5.js');
+      },
+      sourceFileName: function (file) {
+        return file.originalPath;
+      }
     },
 
     // test results reporter to use
@@ -107,6 +123,7 @@ module.exports = function(config) {
       // ('karma-chrome-launcher')
       ('karma-firefox-launcher'),
       ('karma-sourcemap-loader'),
+      ('karma-babel-preprocessor'),
     ]
   });
 };
