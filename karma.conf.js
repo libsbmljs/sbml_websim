@@ -34,7 +34,7 @@ module.exports = function(config) {
     files: [
       {pattern: wasm_dir+'/libsbml.wasm', watched: false, served: true, included: false, type: 'wasm'},
       {pattern: '../models/*.xml', watched: false, served: true, included: false},
-      'test/index.js'
+      'test/index.js',
     ],
 
     webpack: {
@@ -60,7 +60,7 @@ module.exports = function(config) {
     },
 
     proxies: {
-      '/base/libsbml.wasm': '/base/'+wasm_dir+'/libsbml.wasm',
+      '/base/test/libsbml.wasm': '/base/'+wasm_dir+'/libsbml.wasm',
       '/base/models/': path.resolve('models/')
     },
 

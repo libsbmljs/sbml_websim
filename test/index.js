@@ -1,6 +1,6 @@
 // import { assert } from 'chai'
 // import {}
-// import sbml_websim from 'app/bundle'
+import sbml_websim from '../src/index.js'
 
 // describe('Basic Mocha String Test', function () {
 //  it('should return number of charachters in a string', function () {
