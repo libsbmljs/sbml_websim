@@ -1,1 +1,1 @@
-export { loadFromFile } from './loading.js'
+export { loadFromFile, loadFromURL } from './loading.js'

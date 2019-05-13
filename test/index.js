@@ -1,6 +1,7 @@
 // import { assert } from 'chai'
 // import {}
-import sbml_websim from '../src/index.js'
+// import sbml_websim from '../src/index.js'
+import { loadFromURL } from '../src/index.js'
 
 // describe('Basic Mocha String Test', function () {
 //  it('should return number of charachters in a string', function () {
@@ -23,6 +24,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 describe('Loading', function () {
   it('Loads an SBML file', (done) => {
     expect("Hello".length).toEqual(5)
+    const sim = loadFromURL('models/layout-glycolysis.xml')
     done()
   })
 })
