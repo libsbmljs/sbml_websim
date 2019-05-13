@@ -3,3 +3,4 @@
 *.wasm
 __pycache__
 /sbml_websim
+default.profraw
