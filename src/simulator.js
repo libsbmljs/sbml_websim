@@ -1,5 +1,7 @@
+import { Evaluator } from './evaluator.js'
+
 export class Websim {
   constructor(doc) {
-    this.doc = doc
+    this.evaluator = new Evaluator(doc)
   }
 }
