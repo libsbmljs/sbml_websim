@@ -33,7 +33,7 @@ module.exports = function(config) {
     // https://github.com/webpack/webpack-dev-middleware/issues/229
     files: [
       {pattern: wasm_dir+'/libsbml.wasm', watched: false, served: true, included: false, type: 'wasm'},
-      {pattern: '../models/*.xml', watched: false, served: true, included: false},
+      {pattern: 'models/*.xml', watched: false, served: true, included: false},
       'test/index.js',
     ],
 
@@ -61,7 +61,7 @@ module.exports = function(config) {
 
     proxies: {
       '/base/test/libsbml.wasm': '/base/'+wasm_dir+'/libsbml.wasm',
-      '/base/models/': path.resolve('models/')
+      '/base/test/models/': path.resolve('models/')
     },
 
     // list of files to exclude
