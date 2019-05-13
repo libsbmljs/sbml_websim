@@ -1,4 +1,4 @@
-import libsbml from libsbmljs_stable
+// import libsbml from 'libsbmljs_stable'
 
  // base class
 export class SymTree {
@@ -12,7 +12,7 @@ export class Constant extends SymTree {
     this.value = value
   }
 
-  get() {
+  evaluate(evaluator, initial=false, conc=true) {
     return this.value
   }
 }

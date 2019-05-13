@@ -2,9 +2,9 @@ import { libsbml_promise, getLibsbmlReader } from './libsbml.js'
 import { Websim } from './simulator.js'
 
 export function loadFromSBML(sbml) {
-  console.log('start loadFromSBML')
+  // console.log('start loadFromSBML')
   return libsbml_promise.then(() => {
-    console.log('start loadFromSBML promise')
+    // console.log('start loadFromSBML promise')
     // const reader = new getLibsbml().SBMLReader()
     const reader = getLibsbmlReader()
     const doc = reader.readSBMLFromString(sbml)

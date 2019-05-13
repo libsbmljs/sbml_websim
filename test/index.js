@@ -24,18 +24,22 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
 describe('Loading', function () {
   it('Loads an SBML file', (done) => {
-    expect("Hello".length).toEqual(5)
-      // libsbml().then((libsbml) => {
-      //   const reader = new libsbml.SBMLReader()
-      //   libsbml.readSBMLFromURL('base/models/layout-glycolysis.xml').then((doc) => {
-      //     done()
-      //   })
-      // })
-    loadFromURL('http://localhost:9876/base/models/layout-glycolysis.xml').then((sim) => {
-      console.log('loaded')
-      done()
-    }, (err) => {
-      fail('Unable to load model')
-    })
+    try {
+      loadFromURL('http://localhost:9876/base/models/layout-glycolysis.xml').then((sim) => {
+        try {
+          expect("Hello".length).toEqual(5)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
   })
 })
