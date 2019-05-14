@@ -48,12 +48,22 @@ class CompartmentEvaluator extends ComponentEvaluator {
   }
 }
 
-function findCompartment(model, id) {
+function findComponent(model, id) {
   for (const c of model.compartments) {
     if (c.isSetIdAttribute() && c.getId() === id)
       return c
   }
   throw new Error('No compartment with id', id)
+}
+
+function isCompartment(component, model) {
+  if (!component.isSetIdAttribute())
+    throw new Error('Id not set')
+  for (const c of model.compartments) {
+    if (c.isSetIdAttribute() && c.getId() === component.getId())
+      return c
+  }
+  throw new Error('No compartment with id ' + id)
 }
 
  // *** Species ***
@@ -72,13 +82,13 @@ class SpeciesEvaluator extends ComponentEvaluator {
       const convertToConc = (amt) => {
         if (this.compartment === null)
           throw new Error('Cannot convert to conc for species - no compartment set')
-        return new Quotient(amt, evaluator.getTreeForCompartment(findCompartment(this.compartment), evaluator, model))
+        return new Quotient(amt, evaluator.getTreeForComponent(findComponent(this.compartment), model))
       }
 
       const convertToAmt = (conc) => {
         if (this.compartment === null)
           throw new Error('Cannot convert to amt for species - no compartment set')
-        return new Product(amt, evaluator.getTreeForCompartment(findCompartment(this.compartment), evaluator, model))
+        return new Product(amt, evaluator.getTreeForComponent(findComponent(this.compartment), model))
       }
 
       const initial_conc = species.isSetInitialConcentration() ? species.getInitialConcentration() : null
@@ -203,12 +213,19 @@ export class Evaluator {
       return element.getId()
   }
 
-  getTreeForCompartment(compartment, evaluator, model) {
-    if (!compartment.isSetIdAttribute())
-      throw new Error('Compartment has no id')
-    const id = compartment.getId()
+  generateTreeForComponent(component, model) {
+    if (isCompartment(component, model))
+      return new CompartmentEvaluator(compartment, this, model)
+    else
+      throw new Error('Component unknown')
+  }
+
+  getTreeForComponent(component, model) {
+    if (!component.isSetIdAttribute())
+      throw new Error('Component has no id')
+    const id = component.getId()
     if (!this.evaluators.has(id))
-      this.evaluators.set(id, new CompartmentEvaluator(compartment, this, model))
+      this.evaluators.set(id, generateTreeForComponent(component))
     return this.evaluators.get(id).tree
   }
 
