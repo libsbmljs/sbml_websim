@@ -8,7 +8,7 @@ class ComponentEvaluator {
 
  // *** Compartment ***
 class CompartmentEvaluator extends ComponentEvaluator {
-  constructor(compartment, evaluator) {
+  constructor(compartment, evaluator, model) {
     if (!compartment.isSetIdAttribute())
       throw new Error('No id set for compartment')
     super(compartment.getId())
@@ -48,11 +48,17 @@ class CompartmentEvaluator extends ComponentEvaluator {
   }
 }
 
-
+function findCompartment(model, id) {
+  for (const c of model.compartments) {
+    if (c.isSetIdAttribute() && c.getId() === id)
+      return c
+  }
+  throw new Error('No compartment with id', id)
+}
 
  // *** Species ***
 class SpeciesEvaluator extends ComponentEvaluator {
-  constructor(species, model, evaluator) {
+  constructor(species, evaluator, model) {
     try {
       if (!species.isSetIdAttribute())
         throw new Error('No id set for compartment')
@@ -66,13 +72,13 @@ class SpeciesEvaluator extends ComponentEvaluator {
       const convertToConc = (amt) => {
         if (this.compartment === null)
           throw new Error('Cannot convert to conc for species - no compartment set')
-        return new Quotient(amt, evaluator.getTreeFor(this.compartment))
+        return new Quotient(amt, evaluator.getTreeForCompartment(findCompartment(this.compartment), evaluator, model))
       }
 
       const convertToAmt = (conc) => {
         if (this.compartment === null)
           throw new Error('Cannot convert to amt for species - no compartment set')
-        return new Product(amt, evaluator.getTreeFor(this.compartment))
+        return new Product(amt, evaluator.getTreeForCompartment(findCompartment(this.compartment), evaluator, model))
       }
 
       const initial_conc = species.isSetInitialConcentration() ? species.getInitialConcentration() : null
@@ -138,9 +144,9 @@ class SpeciesEvaluator extends ComponentEvaluator {
 
   convert(value, evaluator, initial, is_conc, to_conc) {
     if (to_conc)
-      return this.convertToConc(value, evaluator, initial, to_conc)
+      return this.convertToConc(value, evaluator, initial, is_conc)
     else
-      return this.convertToAmt(value, evaluator, initial, to_conc)
+      return this.convertToAmt(value, evaluator, initial, is_conc)
   }
 
   evaluate(evaluator, initial=false, conc=true) {
@@ -173,16 +179,16 @@ export class Evaluator {
   constructor(doc) {
     try {
       const model = doc.getModel()
+      // this.evaluators = new Map()
       this.evaluators = new Map(model.compartments.map((compartment) =>
-        [this.getIdFor(compartment), new CompartmentEvaluator(compartment)]
+        [this.getIdFor(compartment), new CompartmentEvaluator(compartment, this, model)]
       ))
       for (const species of model.species) {
         if (!species.isSetIdAttribute())
           throw new Error('All species need ids')
         const id = species.getId()
-        this.evaluators.set(id, new SpeciesEvaluator(species, model, this))
+        this.evaluators.set(id, new SpeciesEvaluator(species, this, model))
       }
-      console.log(typeof model.species[0])
       this.initialize()
     } catch(error) {
       console.log(error)
@@ -197,7 +203,12 @@ export class Evaluator {
       return element.getId()
   }
 
-  getTreeFor(id) {
+  getTreeForCompartment(compartment, evaluator, model) {
+    if (!compartment.isSetIdAttribute())
+      throw new Error('Compartment has no id')
+    const id = compartment.getId()
+    if (!this.evaluators.has(id))
+      this.evaluators.set(id, new CompartmentEvaluator(compartment, this, model))
     return this.evaluators.get(id).tree
   }
 
@@ -208,6 +219,8 @@ export class Evaluator {
   }
 
   evaluate(id, initial=false, conc=true) {
+    if (!this.evaluators.has(id))
+      throw new Error('No evaluator for id '+id)
     return this.evaluators.get(id).evaluate(this, initial, conc)
   }
 }

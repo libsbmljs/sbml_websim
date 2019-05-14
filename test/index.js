@@ -28,6 +28,9 @@ describe('Loading', function () {
       loadFromURL('http://localhost:9876/base/models/layout-glycolysis.xml').then((sim) => {
         try {
           expect("Hello".length).toEqual(5)
+          expect(sim.evaluator.evaluate('ATP', true, true)).toEqual(3)
+          expect(sim.evaluator.evaluate('ATP', true, false)).toEqual(3)
+          console.log('ATP amt', sim.evaluator.evaluate('ATP', true, false))
         } catch(error) {
           fail(error)
           console.log(error.stack)
