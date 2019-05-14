@@ -17,6 +17,18 @@ export class Constant extends SymTree {
   }
 }
 
+export class Symbol extends SymTree {
+  constructor(symbol) {
+    super()
+    // the sbml elt id
+    this.symbol = symbol
+  }
+
+  evaluate(evaluator, initial=false, conc=true) {
+    return evaluator.evaluate(this.symbol, initial, conc)
+  }
+}
+
  // binary ops
 export class BinaryOperator extends SymTree {
   constructor(lhs, rhs) {
