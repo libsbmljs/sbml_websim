@@ -1,0 +1,139 @@
+import { ComponentEvaluator } from './base.js'
+import { Constant, Product, Quotient, FromSBMLMath } from './symtree.js'
+
+function findComponent(model, id) {
+  for (const c of model.compartments) {
+    if (c.isSetIdAttribute() && c.getId() === id)
+      return c
+  }
+  throw new Error('No compartment with id', id)
+}
+
+function isCompartment(component, model) {
+  if (!component.isSetIdAttribute())
+    throw new Error('Id not set')
+  for (const c of model.compartments) {
+    if (c.isSetIdAttribute() && c.getId() === component.getId())
+      return c
+  }
+  throw new Error('No compartment with id ' + id)
+}
+
+// *** Species ***
+export class SpeciesEvaluator extends ComponentEvaluator {
+ constructor(species, evaluator, model) {
+   try {
+     if (!species.isSetIdAttribute())
+       throw new Error('No id set for compartment')
+     super(species.getId())
+
+     this.compartment = species.isSetCompartment() ? species.getCompartment() : null
+     this.is_const = species.isSetConstant() && species.getConstant()
+     this.is_boundary = species.isSetBoundaryCondition() && species.getBoundaryCondition()
+     this.subs_units = species.isSetHasOnlySubstanceUnits() && species.getHasOnlySubstanceUnits()
+
+     const convertToConc = (amt) => {
+       if (this.compartment === null)
+         throw new Error('Cannot convert to conc for species - no compartment set')
+       return new Quotient(amt, evaluator.getTreeForComponent(findComponent(this.compartment), model))
+     }
+
+     const convertToAmt = (conc) => {
+       if (this.compartment === null)
+         throw new Error('Cannot convert to amt for species - no compartment set')
+       return new Product(amt, evaluator.getTreeForComponent(findComponent(this.compartment), model))
+     }
+
+     const initial_conc = species.isSetInitialConcentration() ? species.getInitialConcentration() : null
+     const initial_amt  = species.isSetInitialAmount() ? species.getInitialAmount() : null
+     for (const rule of model.rules) {
+       if (rule.isAssignment() && rule.isSetVariable() &&
+           rule .getVariable() === this.id && rule.isSetMath()) {
+         // species is set by an assignment rule
+         this.tree = new FromSBMLMath(rule.getMath())
+         this.value = null
+         return
+       }
+     }
+
+     if (this.subs_units) {
+       // value is always in terms of amount
+       if (initial_amt !== null)
+         this.tree = new Constant(initial_amt)
+       else if(initial_conc !== null)
+         this.tree = convertToAmt(new Constant(initial_conc))
+       else
+         this.tree = new Constant(0)
+         // throw new Error('Species with substance units but no initial amount and no assignment rule')
+     } else {
+       // not substance units - value is always in terms of conc
+       if (initial_amt !== null)
+         this.tree = convertToConc(new Constant(initial_amt))
+       else if (initial_conc !== null)
+         this.tree = new Constant(initial_conc)
+       else
+         this.tree = new Constant(0)
+     }
+
+     this.value = null
+   } catch(error) {
+     console.log(error)
+     throw(error)
+   }
+ }
+
+ convertToConc(value, evaluator, initial, conc) {
+   if (conc === true)
+     return value
+   else {
+     if (this.compartment === null)
+       throw new Error('Cannot convert if compartment not set')
+     return value*evaluator.evaluate(this.compartment, initial, conc)
+   }
+ }
+
+ convertToAmt(value, evaluator, initial, conc) {
+   if (conc === false)
+     return value
+   else {
+     if (this.compartment === null)
+       throw new Error('Cannot convert if compartment not set')
+     const c = evaluator.evaluate(this.compartment, initial, conc)
+     if (c === 0)
+       throw new Error('Compartment size zero')
+     return value/c
+   }
+ }
+
+ convert(value, evaluator, initial, is_conc, to_conc) {
+   if (to_conc)
+     return this.convertToConc(value, evaluator, initial, is_conc)
+   else
+     return this.convertToAmt(value, evaluator, initial, is_conc)
+ }
+
+ evaluate(evaluator, initial=false, conc=true) {
+   if (initial)
+     return this.convert(
+       this.tree.evaluate(evaluator, initial, conc),
+       evaluator, initial, !this.subs_units, conc)
+   else
+     return this.convert(
+       this.value,
+       evaluator, initial, !this.subs_units, conc)
+ }
+
+ initialize(evaluator, conc=true) {
+   this.value = this.tree.evaluate(evaluator, true, conc)
+   console.log('species initial val', this.id, this.value)
+ }
+
+ set(value, initial=false, conc=true) {
+   if (this.is_const)
+     throw new Error('Cannot set value of species which is const')
+   if (!initial)
+     this.value = this.convert(value, evaluator, initial, !this.subs_units, conc)
+   else
+     throw new Error('Cannot set species initial value')
+ }
+}
