@@ -1,17 +1,22 @@
 import { ComponentEvaluator } from './base.js'
-import { Constant, Product, Quotient, FromSBMLMath } from './symtree.js'
+import { Constant, FromSBMLMath } from '../symtree.js'
 
  // *** Compartment ***
-export class CompartmentEvaluator extends ComponentEvaluator {
+export class ReactionEvaluator extends ComponentEvaluator {
   constructor(reaction, evaluator, model) {
     if (!reaction.isSetIdAttribute())
       throw new Error('No id set for reaction')
     super(reaction.getId())
 
-    if (reaction.isSetMath())
-      this.tree = new FromSBMLMath(reaction.getMath())
-    else
+    if (reaction.isSetKineticLaw()) {
+      const kinetic_law = reaction.getKineticLaw()
+      if (kinetic_law.isSetMath())
+        this.tree = new FromSBMLMath(kinetic_law.getMath())
+      else
+        this.tree = new Constant(0)
+    } else {
       this.tree = new Constant(0)
+    }
 
     this.value = null
   }

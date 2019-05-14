@@ -1,5 +1,6 @@
 import { CompartmentEvaluator } from './evaluators/compartment.js'
 import { SpeciesEvaluator } from './evaluators/species.js'
+import { ReactionEvaluator } from './evaluators/reaction.js'
 
 export class Evaluator {
   constructor(doc) {

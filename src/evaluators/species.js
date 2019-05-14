@@ -1,5 +1,5 @@
 import { ComponentEvaluator } from './base.js'
-import { Constant, Product, Quotient, FromSBMLMath } from './symtree.js'
+import { Constant, Product, Quotient, FromSBMLMath } from '../symtree.js'
 
 function findComponent(model, id) {
   for (const c of model.compartments) {
