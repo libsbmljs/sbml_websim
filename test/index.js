@@ -21,10 +21,10 @@ describe('Main', function () {
           expect(sim.evaluator.evaluate('Y',  true, true)).toBe(20)
 
           // initial rates
-          expect(sim.evaluator.evaluateRate('PY',  true, true)).toBeCloseTo(138.63, 2)
-          expect(sim.evaluator.evaluateRate('Y',  true, true)).toBeCloseTo(23.07, 2)
-          expect(sim.evaluator.evaluateRate('X',  true, true)).toBe(30)
-          expect(sim.evaluator.evaluateRate('Z',  true, true)).toBe(30)
+          expect(sim.evaluator.evaluateIndepRate('PY',  true, true)).toBeCloseTo(138.63, 2)
+          expect(sim.evaluator.evaluateIndepRate('Y',  true, true)).toBeCloseTo(23.07, 2)
+          expect(sim.evaluator.evaluateIndepRate('X',  true, true)).toBe(30)
+          expect(sim.evaluator.evaluateIndepRate('Z',  true, true)).toBe(30)
         } catch(error) {
           fail(error)
           console.log(error.stack)
@@ -59,10 +59,10 @@ describe('Main', function () {
           // console.log('ATP amt', sim.evaluator.evaluate('ATP', true, false))
 
           // initial rates
-          expect(sim.evaluator.evaluateRate('Glucose',  true, true)).toBe(50)
-          expect(sim.evaluator.evaluateRate('ATP',  true, true)).toBe(-84)
-          expect(sim.evaluator.evaluateRate('ADP',  true, true)).toBe(84)
-          expect(sim.evaluator.evaluateRate('External_glucose',  true, true)).toBe(0) // boundary
+          expect(sim.evaluator.evaluateIndepRate('Glucose',  true, true)).toBe(50)
+          expect(sim.evaluator.evaluateIndepRate('ATP',  true, true)).toBe(-84)
+          expect(sim.evaluator.evaluateIndepRate('ADP',  true, true)).toBe(84)
+          expect(() => sim.evaluator.evaluateIndepRate('External_glucose',  true, true)).toThrow() // boundary
         } catch(error) {
           fail(error)
           console.log(error.stack)
@@ -92,9 +92,12 @@ describe('Main', function () {
           expect(sim.evaluator.evaluate('C', true, true)).toBe(0)
 
           // initial rates
-          expect(sim.evaluator.evaluateRate('A',  true, true)).toBe(-100)
-          expect(sim.evaluator.evaluateRate('B',  true, true)).toBe(50)
-          expect(sim.evaluator.evaluateRate('C',  true, true)).toBe(0)
+          expect(sim.evaluator.evaluateIndepRate('A',  true, true)).toBe(-100)
+          expect(sim.evaluator.evaluateIndepRate('B',  true, true)).toBe(50)
+          expect(sim.evaluator.evaluateIndepRate('C',  true, true)).toBe(0)
+
+          sim.simulateFor(10)
+          console.log('after sim ABC ', sim.evaluator.evaluate('A', false, true), sim.evaluator.evaluate('B', false, true), sim.evaluator.evaluate('C', false, true))
         } catch(error) {
           fail(error)
           console.log(error.stack)

@@ -109,7 +109,7 @@ export class Evaluator {
     return this.evaluators.get(id).evaluate(this, initial, conc)
   }
 
-  evaluateIndepRates(id, initial=false, conc=true) {
+  evaluateIndepRate(id, initial=false, conc=true) {
     if (!this.indep_rate_evals_map.has(id))
       throw new Error('No evaluator for id '+id)
     return this.indep_rate_evals_map.get(id).evaluate(this, initial, conc)
@@ -121,5 +121,9 @@ export class Evaluator {
 
   calcIndepRates() {
     return this.indep_rate_evals.map((e) => e.evaluate(this, false, true))
+  }
+
+  getIndepInitialVals() {
+    return this.indep_rate_evals.map((e) => this.evaluate(e.id, true, true))
   }
 }

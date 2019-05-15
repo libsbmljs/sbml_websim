@@ -19,7 +19,7 @@ export class Websim {
     return this.evaluator.getCurrentTime()
   }
 
-  simulate(duration) {
+  simulateFor(duration) {
     return this.evaluator.calcIndepRates()
   }
 }
