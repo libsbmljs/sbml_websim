@@ -2,7 +2,7 @@ import { CompartmentEvaluator } from './evaluators/compartment.js'
 import { SpeciesEvaluator } from './evaluators/species.js'
 import { ReactionEvaluator } from './evaluators/reaction.js'
 import { ParameterEvaluator } from './evaluators/parameter.js'
-import { RateEvaluator } from './evaluators/parameter.js'
+import { RateEvaluator } from './evaluators/rate.js'
 
 function isComponentIn(component, components) {
   if (!component.isSetIdAttribute())
@@ -51,9 +51,9 @@ export class Evaluator {
         this.evaluators.set(id, new ReactionEvaluator(reaction, this, model))
       }
       // species rates
-      this.species_rate_evals = model.species.map((species) => {
-        return new RateEvaluator(species, this, model)//)
-      })
+      this.species_rate_evals = model.species.map((species) =>
+        new RateEvaluator(species, this, model)
+      )
       this.initialize()
     } catch(error) {
       console.log(error)
@@ -94,6 +94,9 @@ export class Evaluator {
     for (const [id, evaluator] of this.evaluators) {
       evaluator.initialize(this)
     }
+      for (const evaluator of this.species_rate_evals) {
+        evaluator.initialize(this)
+      }
   }
 
   evaluate(id, initial=false, conc=true) {

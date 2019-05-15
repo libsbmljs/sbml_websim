@@ -1,23 +1,35 @@
 import { range } from 'lodash'
 
 import { EvaluatorBase } from './base.js'
-import { Product, Sum, Difference, Negation, FromSBMLMath } from '../symtree.js'
+import { Constant, Product, Sum, Difference, Negation, FromSBMLMath } from '../symtree.js'
 
-function calcStoichiometry(ref) {
-
+function calcStoichiometry(ref, model) {
+  if (ref.isSetStoichiometry())
+    return new Constant(ref.getStoichiometry())
+  else if (ref.isSetStoichiometryMath()) {
+    for (const rule of model.rules) {
+      if (rule.isInitialAssignment() && rule.isSetVariable() &&
+          rule .getVariable() === this.id && rule.isSetMath())
+        return FromSBMLMath(rule.getMath())
+      throw new Error('No initial assignment rule for stoichiometry math')
+    }
+  } else
+    // assume unity
+    return new Constant(1)
+    // throw new Error('Neither numeric stoichiometry nor stoichiometry math is set for species reference')
 }
 
-function`appendToTree(newtree, tree, invert=false) {
+function appendToTree(newtree, tree, invert=false) {
   if (tree === null) {
     if (!invert)
       return newtree
     else
-      return Negation(newtree)
+      return new Negation(newtree)
   }else {
     if (!invert)
-      return Sum(tree, newtree)
+      return new Sum(tree, newtree)
     else
-      return Difference(tree, newtree)
+      return new Difference(tree, newtree)
   }
 }
 
@@ -48,14 +60,17 @@ export class RateEvaluator extends EvaluatorBase {
             (k) => reaction.getReactant(k) )) {
         if (reactant.isSetSpecies() && reactant.getSpecies() === this.id)
           this.tree = appendToTree(
-              new Product(calcStoichiometry(reactant), evaluator.getTreeForComponent(reaction)),
+              new Product(calcStoichiometry(reactant, model), evaluator.getTreeForComponent(reaction)),
               this.tree,
               false)
       }
-   }
+    }
+
+    if (this.tree === null)
+      this.tree = new Constant(0)
 
    // this.value = null
- }
+  }
 
   evaluate(evaluator, initial=false, conc=true) {
     // if (initial)
@@ -67,10 +82,10 @@ export class RateEvaluator extends EvaluatorBase {
      // }
   }
 
-   initialize(evaluator, conc=true) {
-     // this.value = this.tree.evaluate(evaluator, true, conc)
-     console.log('species rate', this.id, this.evaluate(evaluator, true, true))
-   }
+  initialize(evaluator, conc=true) {
+    // this.value = this.tree.evaluate(evaluator, true, conc)
+    console.log('species rate', this.id, this.evaluate(evaluator, true, true))
+  }
 
  // set(value, initial=false, conc=true) {
  //   if (!initial)
