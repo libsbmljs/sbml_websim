@@ -1,7 +1,8 @@
 import { range } from 'lodash'
 
 import { EvaluatorBase } from './base.js'
-import { Constant, Product, Sum, Difference, Negation, FromSBMLMath } from '../symtree.js'
+import { Constant, Product, Sum, Difference,
+         Negation, Symbol, FromSBMLMath } from '../symtree.js'
 
 function calcStoichiometry(ref, model) {
   if (ref.isSetStoichiometry())
@@ -55,12 +56,26 @@ export class RateEvaluator extends EvaluatorBase {
 
     // calculate the rate based on reactions this species participates in
     for (const reaction of model.reactions) {
+      if (!reaction.isSetIdAttribute())
+        throw new Error('All reactions must have ids')
+      // reactants
       for ( const reactant of range(
             reaction.getNumReactants()).map(
             (k) => reaction.getReactant(k) )) {
         if (reactant.isSetSpecies() && reactant.getSpecies() === this.id)
           this.tree = appendToTree(
-              new Product(calcStoichiometry(reactant, model), evaluator.getTreeForComponent(reaction)),
+              // new Product(calcStoichiometry(reactant, model), evaluator.getTreeForComponent(reaction)),
+              new Product(calcStoichiometry(reactant, model), new Symbol(reaction.getId())),
+              this.tree,
+              true)
+      }
+      // products
+      for ( const product of range(
+            reaction.getNumProducts()).map(
+            (k) => reaction.getProduct(k) )) {
+        if (product.isSetSpecies() && product.getSpecies() === this.id)
+          this.tree = appendToTree(
+              new Product(calcStoichiometry(product, model), new Symbol(reaction.getId())),
               this.tree,
               false)
       }
