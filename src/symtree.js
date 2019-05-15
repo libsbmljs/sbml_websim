@@ -159,7 +159,7 @@ export function FromSBMLMath(ast, k=0) {
     throw new Error('Leaf node overflow')
 
   const libsbml = getLibsbml()
-  console.log('ast.getType()', ast.getType(), 'libsbml.AST_FUNCTION_FLOOR', libsbml.AST_FUNCTION_FLOOR, 'k', k, 'nchildren', ast.getNumChildren())
+  // console.log('ast.getType()', ast.getType(), 'libsbml.AST_FUNCTION_FLOOR', libsbml.AST_FUNCTION_FLOOR, 'k', k, 'nchildren', ast.getNumChildren())
 
   // printAST(ast)
 
@@ -196,7 +196,6 @@ export function FromSBMLMath(ast, k=0) {
     case libsbml.AST_RATIONAL:
       return new Constant(ast.getValue())
     case libsbml.AST_NAME:
-      console.log('AST name', ast.getName())
       return new Symbol(ast.getName())
     // case libsbml.AST_NAME_AVOGADRO:
     case libsbml.AST_NAME_TIME:

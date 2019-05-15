@@ -1,0 +1,15 @@
+model comp_test()
+  compartment C1 = 1
+  compartment C2 = 2
+  var species A in C1 = 10
+  var species B in C2 = 0
+  var species C in C2 = 0
+
+  J0: A -> B; k1f*A - k1r*B
+  J1: B -> C; k2f*B - k2r*C
+
+  k1f = 10
+  k1r = 5
+  k2f = 15
+  k2r = 2
+end
