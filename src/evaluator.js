@@ -51,6 +51,10 @@ export class Evaluator {
     return this.evaluators.get(id).tree
   }
 
+  getCurrentTime() {
+    return 0
+  }
+
   initialize() {
     for (const [id, evaluator] of this.evaluators) {
       evaluator.initialize(this)

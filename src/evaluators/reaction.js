@@ -11,7 +11,7 @@ export class ReactionEvaluator extends ComponentEvaluator {
     if (reaction.isSetKineticLaw()) {
       const kinetic_law = reaction.getKineticLaw()
       if (kinetic_law.isSetMath())
-        this.tree = new FromSBMLMath(kinetic_law.getMath())
+        this.tree = FromSBMLMath(kinetic_law.getMath())
       else
         this.tree = new Constant(0)
     } else {

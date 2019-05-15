@@ -50,7 +50,7 @@ export class SpeciesEvaluator extends ComponentEvaluator {
        if (rule.isAssignment() && rule.isSetVariable() &&
            rule .getVariable() === this.id && rule.isSetMath()) {
          // species is set by an assignment rule
-         this.tree = new FromSBMLMath(rule.getMath())
+         this.tree = FromSBMLMath(rule.getMath())
          this.value = null
          return
        }
