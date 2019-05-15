@@ -2,6 +2,25 @@ import { CompartmentEvaluator } from './evaluators/compartment.js'
 import { SpeciesEvaluator } from './evaluators/species.js'
 import { ReactionEvaluator } from './evaluators/reaction.js'
 import { ParameterEvaluator } from './evaluators/parameter.js'
+import { RateEvaluator } from './evaluators/parameter.js'
+
+function isComponentIn(component, components) {
+  if (!component.isSetIdAttribute())
+    throw new Error('Id not set')
+  for (const x of components) {
+    if (x.isSetIdAttribute() && x.getId() === component.getId())
+      return true
+  }
+  return false
+}
+
+function isCompartment(component, model) {
+  return isComponentIn(component, model.compartments)
+}
+
+function isReaction(component, model) {
+  return isComponentIn(component, model.reactions)
+}
 
 export class Evaluator {
   constructor(doc) {
@@ -10,24 +29,31 @@ export class Evaluator {
       this.evaluators = new Map(model.compartments.map((compartment) =>
         [this.getIdFor(compartment), new CompartmentEvaluator(compartment, this, model)]
       ))
+      // species
       for (const species of model.species) {
         if (!species.isSetIdAttribute())
           throw new Error('All species need ids')
         const id = species.getId()
         this.evaluators.set(id, new SpeciesEvaluator(species, this, model))
       }
+      // parameters
       for (const parameter of model.parameters) {
         if (!parameter.isSetIdAttribute())
           throw new Error('All parameter need ids')
         const id = parameter.getId()
         this.evaluators.set(id, new ParameterEvaluator(parameter, this, model))
       }
+      // reactions
       for (const reaction of model.reactions) {
         if (!reaction.isSetIdAttribute())
           throw new Error('All reactions need ids')
         const id = reaction.getId()
         this.evaluators.set(id, new ReactionEvaluator(reaction, this, model))
       }
+      // species rates
+      this.species_rate_evals = model.species.map((species) => {
+        return new RateEvaluator(species, this, model)//)
+      })
       this.initialize()
     } catch(error) {
       console.log(error)
@@ -44,7 +70,9 @@ export class Evaluator {
 
   generateTreeForComponent(component, model) {
     if (isCompartment(component, model))
-      return new CompartmentEvaluator(compartment, this, model)
+      return new CompartmentEvaluator(component, this, model)
+    else if (isReaction(component, model))
+      return new ReactionEvaluator(component, this, model)
     else
       throw new Error('Component unknown')
   }

@@ -9,16 +9,6 @@ function findComponent(model, id) {
   throw new Error('No compartment with id', id)
 }
 
-function isCompartment(component, model) {
-  if (!component.isSetIdAttribute())
-    throw new Error('Id not set')
-  for (const c of model.compartments) {
-    if (c.isSetIdAttribute() && c.getId() === component.getId())
-      return c
-  }
-  throw new Error('No compartment with id ' + id)
-}
-
 // *** Species ***
 export class SpeciesEvaluator extends ComponentEvaluator {
  constructor(species, evaluator, model) {
@@ -30,6 +20,7 @@ export class SpeciesEvaluator extends ComponentEvaluator {
      this.compartment = species.isSetCompartment() ? species.getCompartment() : null
      this.is_const = species.isSetConstant() && species.getConstant()
      this.is_boundary = species.isSetBoundaryCondition() && species.getBoundaryCondition()
+     this.has_rule = false
      this.subs_units = species.isSetHasOnlySubstanceUnits() && species.getHasOnlySubstanceUnits()
 
      const convertToConc = (amt) => {
@@ -51,6 +42,7 @@ export class SpeciesEvaluator extends ComponentEvaluator {
            rule .getVariable() === this.id && rule.isSetMath()) {
          // species is set by an assignment rule
          this.tree = FromSBMLMath(rule.getMath())
+         this.has_rule = true
          this.value = null
          return
        }
@@ -131,6 +123,8 @@ export class SpeciesEvaluator extends ComponentEvaluator {
  set(value, initial=false, conc=true) {
    if (this.is_const)
      throw new Error('Cannot set value of species which is const')
+   if (this.has_rule)
+     throw new Error('Cannot set value of species which has a rate or assignment rule')
    if (!initial)
      this.value = this.convert(value, evaluator, initial, !this.subs_units, conc)
    else
