@@ -18,6 +18,13 @@ describe('Main', function () {
           expect(sim.evaluator.evaluate('Reaction12', true, true)).toBe(30)
 
           // initial species values
+          expect(sim.evaluator.evaluate('Y',  true, true)).toBe(20)
+
+          // initial rates
+          expect(sim.evaluator.evaluateRate('PY',  true, true)).toBeCloseTo(138.63, 2)
+          expect(sim.evaluator.evaluateRate('Y',  true, true)).toBeCloseTo(23.07, 2)
+          expect(sim.evaluator.evaluateRate('X',  true, true)).toBe(30)
+          expect(sim.evaluator.evaluateRate('Z',  true, true)).toBe(30)
         } catch(error) {
           fail(error)
           console.log(error.stack)
@@ -83,6 +90,11 @@ describe('Main', function () {
           expect(sim.evaluator.evaluate('A', true, true)).toBe(10)
           expect(sim.evaluator.evaluate('B', true, true)).toBe(0)
           expect(sim.evaluator.evaluate('C', true, true)).toBe(0)
+
+          // initial rates
+          expect(sim.evaluator.evaluateRate('A',  true, true)).toBe(-100)
+          expect(sim.evaluator.evaluateRate('B',  true, true)).toBe(50)
+          expect(sim.evaluator.evaluateRate('C',  true, true)).toBe(0)
         } catch(error) {
           fail(error)
           console.log(error.stack)

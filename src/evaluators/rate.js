@@ -1,7 +1,7 @@
 import { range } from 'lodash'
 
 import { EvaluatorBase } from './base.js'
-import { Constant, Product, Sum, Difference,
+import { Constant, Product, Quotient, Sum, Difference,
          Negation, Symbol, FromSBMLMath } from '../symtree.js'
 
 function calcStoichiometry(ref, model) {
@@ -89,6 +89,8 @@ export class RateEvaluator extends EvaluatorBase {
 
     if (this.tree === null)
       this.tree = new Constant(0)
+    else if (species.isSetCompartment())
+      this.tree = new Quotient(this.tree, new Symbol(species.getCompartment()))
 
    // this.value = null
   }

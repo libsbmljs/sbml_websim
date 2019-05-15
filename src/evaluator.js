@@ -25,6 +25,7 @@ function isReaction(component, model) {
 export class Evaluator {
   constructor(doc) {
     try {
+      this.time = 0
       const model = doc.getModel()
       this.evaluators = new Map(model.compartments.map((compartment) =>
         [this.getIdFor(compartment), new CompartmentEvaluator(compartment, this, model)]
@@ -51,10 +52,12 @@ export class Evaluator {
         this.evaluators.set(id, new ReactionEvaluator(reaction, this, model))
       }
       // species rates
-      this.species_rate_evals = model.species.map((species) =>
+      this.indep_rate_evals = model.species
+        .filter((species) => this.evaluators.get(species.getId()).isIndependent())
+        .map((species) =>
         new RateEvaluator(species, this, model)
       )
-      this.species_rate_evals_map = new Map(this.species_rate_evals.map((e) => [e.id, e]))
+      this.indep_rate_evals_map = new Map(this.indep_rate_evals.map((e) => [e.id, e]))
       this.initialize()
     } catch(error) {
       console.log(error)
@@ -88,14 +91,14 @@ export class Evaluator {
   }
 
   getCurrentTime() {
-    return 0
+    return this.time
   }
 
   initialize() {
     for (const [id, evaluator] of this.evaluators) {
       evaluator.initialize(this)
     }
-      for (const evaluator of this.species_rate_evals) {
+      for (const evaluator of this.indep_rate_evals) {
         evaluator.initialize(this)
       }
   }
@@ -106,9 +109,17 @@ export class Evaluator {
     return this.evaluators.get(id).evaluate(this, initial, conc)
   }
 
-  evaluateRate(id, initial=false, conc=true) {
-    if (!this.species_rate_evals_map.has(id))
+  evaluateIndepRates(id, initial=false, conc=true) {
+    if (!this.indep_rate_evals_map.has(id))
       throw new Error('No evaluator for id '+id)
-    return this.species_rate_evals_map.get(id).evaluate(this, initial, conc)
+    return this.indep_rate_evals_map.get(id).evaluate(this, initial, conc)
+  }
+
+  getNumIndepVars() {
+    return this.indep_rate_evals.length
+  }
+
+  calcIndepRates() {
+    return this.indep_rate_evals.map((e) => e.evaluate(this, false, true))
   }
 }

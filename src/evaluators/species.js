@@ -130,4 +130,8 @@ export class SpeciesEvaluator extends ComponentEvaluator {
    else
      throw new Error('Cannot set species initial value')
  }
+
+ isIndependent() {
+   return !this.is_const && !this.is_boundary
+ }
 }
