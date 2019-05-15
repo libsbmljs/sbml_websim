@@ -50,6 +50,12 @@ describe('Main', function () {
           expect(sim.evaluator.evaluate('NAD',  true, true)).toBe(0.5)
           expect(sim.evaluator.evaluate('NADH', true, true)).toBe(0.5)
           // console.log('ATP amt', sim.evaluator.evaluate('ATP', true, false))
+
+          // initial rates
+          expect(sim.evaluator.evaluateRate('Glucose',  true, true)).toBe(50)
+          expect(sim.evaluator.evaluateRate('ATP',  true, true)).toBe(-84)
+          expect(sim.evaluator.evaluateRate('ADP',  true, true)).toBe(84)
+          expect(sim.evaluator.evaluateRate('External_glucose',  true, true)).toBe(0) // boundary
         } catch(error) {
           fail(error)
           console.log(error.stack)

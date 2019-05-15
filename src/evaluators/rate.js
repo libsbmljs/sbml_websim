@@ -43,6 +43,12 @@ export class RateEvaluator extends EvaluatorBase {
     this.id = species.getId()
     this.tree = null
 
+    // boundary species
+    if (species.isSetBoundaryCondition() && species.getBoundaryCondition()) {
+      this.tree = new Constant(0)
+      return
+    }
+
     // use rate rule if set
     for (const rule of model.rules) {
       if (rule.isRate() && rule.isSetVariable() &&

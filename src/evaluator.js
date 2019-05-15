@@ -54,6 +54,7 @@ export class Evaluator {
       this.species_rate_evals = model.species.map((species) =>
         new RateEvaluator(species, this, model)
       )
+      this.species_rate_evals_map = new Map(this.species_rate_evals.map((e) => [e.id, e]))
       this.initialize()
     } catch(error) {
       console.log(error)
@@ -103,5 +104,11 @@ export class Evaluator {
     if (!this.evaluators.has(id))
       throw new Error('No evaluator for id '+id)
     return this.evaluators.get(id).evaluate(this, initial, conc)
+  }
+
+  evaluateRate(id, initial=false, conc=true) {
+    if (!this.species_rate_evals_map.has(id))
+      throw new Error('No evaluator for id '+id)
+    return this.species_rate_evals_map.get(id).evaluate(this, initial, conc)
   }
 }
