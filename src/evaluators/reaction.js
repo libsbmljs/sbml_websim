@@ -31,6 +31,7 @@ export class ReactionEvaluator extends ComponentEvaluator {
 
   initialize(evaluator, conc=true) {
     this.value = this.tree.evaluate(evaluator, true, conc)
+    console.log('reaction', this.id, this.value)
   }
 
   set(value, initial=false, conc=true) {
