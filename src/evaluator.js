@@ -1,6 +1,7 @@
 import { CompartmentEvaluator } from './evaluators/compartment.js'
 import { SpeciesEvaluator } from './evaluators/species.js'
 import { ReactionEvaluator } from './evaluators/reaction.js'
+import { ParameterEvaluator } from './evaluators/parameter.js'
 
 export class Evaluator {
   constructor(doc) {
@@ -14,6 +15,12 @@ export class Evaluator {
           throw new Error('All species need ids')
         const id = species.getId()
         this.evaluators.set(id, new SpeciesEvaluator(species, this, model))
+      }
+      for (const parameter of model.parameters) {
+        if (!parameter.isSetIdAttribute())
+          throw new Error('All parameter need ids')
+        const id = parameter.getId()
+        this.evaluators.set(id, new ParameterEvaluator(parameter, this, model))
       }
       for (const reaction of model.reactions) {
         if (!reaction.isSetIdAttribute())

@@ -1,7 +1,7 @@
 import { ComponentEvaluator } from './base.js'
 import { Constant, FromSBMLMath } from '../symtree.js'
 
- // *** Compartment ***
+ // *** Reaction ***
 export class ReactionEvaluator extends ComponentEvaluator {
   constructor(reaction, evaluator, model) {
     if (!reaction.isSetIdAttribute())

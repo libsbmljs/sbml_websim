@@ -121,20 +121,20 @@ export class Exponentiation extends BinaryOperator {
  }
 }
 
-function printAST(ast, depth=0) {
-  let indent = ''
-  let name = ''
-  for (var k=0; k<depth; k++)
-    indent += ' '
-  if (ast.getType() === libsbml.AST_NAME)
-    name = ast.getName()
-  console.log(indent, ast.getType(), name)
-  if (ast.getType() === libsbml.AST_TIMES) {
-    for (var k=0; k<ast.getNumChildren(); k++) {
-      printAST(ast.getChild(k), depth+1)
-    }
-  }
-}
+// function printAST(ast, depth=0) {
+//   let indent = ''
+//   let name = ''
+//   for (var k=0; k<depth; k++)
+//     indent += ' '
+//   if (ast.getType() === libsbml.AST_NAME)
+//     name = ast.getName()
+//   console.log(indent, ast.getType(), name)
+//   if (ast.getType() === libsbml.AST_TIMES) {
+//     for (var k=0; k<ast.getNumChildren(); k++) {
+//       printAST(ast.getChild(k), depth+1)
+//     }
+//   }
+// }
 
 function getChild(ast, k) {
   if (k >= 0 && k < ast.getNumChildren())
@@ -143,22 +143,14 @@ function getChild(ast, k) {
     throw new Error('Child node overflow')
 }
 
-// export function FromSBMLMath(ast, k=0) {
-// }
-
 export function FromSBMLMath(ast, k=0) {
-  if (ast.getNumChildren() > 0 && k+1 > ast.getNumChildren()) {
-    // console.log(ast.getType(), ast.getNumChildren(), 'k', k)
+  if (ast.getNumChildren() > 0 && k+1 > ast.getNumChildren())
     throw new Error('Leaf node overflow')
-  }
 
   const libsbml = getLibsbml()
-  // console.log('ast.getType()', ast.getType(), 'libsbml.AST_NAME', libsbml.AST_NAME)
-  console.log('ast.getType()', ast.getType(), 'libsbml.AST_DIVIDE', libsbml.AST_DIVIDE, 'k', k, 'nchildren', ast.getNumChildren())
+  // console.log('ast.getType()', ast.getType(), 'libsbml.AST_DIVIDE', libsbml.AST_DIVIDE, 'k', k, 'nchildren', ast.getNumChildren())
 
-  printAST(ast)
-  return new Product(new Constant(1), new Constant(2))
-  // return new Constant(1)
+  // printAST(ast)
 
   switch(ast.getType()) {
     case libsbml.AST_PLUS:
@@ -172,21 +164,17 @@ export function FromSBMLMath(ast, k=0) {
       else
         return new Difference(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_TIMES:
-      if (k+2 === ast.getNumChildren()) {
-        console.log('product n children', ast.getNumChildren(), 'leaf k', k)
-        // return new Product(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
-        // return new Product(FromSBMLMath(getChild(ast, k)), new Constant(1))
-        return new Product(new Constant(1), new Constant(2))
-      } else {
-        console.log('product n children', ast.getNumChildren(), 'branch k', k)
+      if (k+2 === ast.getNumChildren())
+        return new Product(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
+      else
         return new Product(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
-      }
     case libsbml.AST_DIVIDE:
       if (k+2 === ast.getNumChildren())
         return new Quotient(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
         return new Quotient(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_POWER:
+    case libsbml.AST_FUNCTION_POWER:
       if (k+2 === ast.getNumChildren())
         return new Exponentiation(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
@@ -195,8 +183,6 @@ export function FromSBMLMath(ast, k=0) {
     case libsbml.AST_REAL:
     case libsbml.AST_REAL_E:
     case libsbml.AST_RATIONAL:
-      if (!ast.isSetValue())
-        throw new Error('No value for numeric AST node')
       return new Constant(ast.getValue())
     case libsbml.AST_NAME:
       console.log('AST name', ast.getName())
