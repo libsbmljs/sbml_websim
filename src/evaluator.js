@@ -119,7 +119,6 @@ export class Evaluator {
   }
 
   setIndepValue(k, value, initial=false, conc=true) {
-    console.log('set indep val', this.indep_rate_evals[k].id, value)
     this.setValue(this.indep_rate_evals[k].id, value, initial, conc)
   }
 

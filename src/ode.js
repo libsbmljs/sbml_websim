@@ -25,11 +25,10 @@ export class ODE {
     // TODO: use static var?
     // x = time, y = indep. values
     this.evaluator.time = x
-    for(var k=0, N=this.evaluator.getNumIndepVars(); k<N; k++) {
+    for(var k=0, N=this.evaluator.getNumIndepVars(); k<N; k++)
       this.evaluator.setIndepValue(k, y[k])
-    }
     this.evaluator.updateReactionRates()
-    console.log(' rates at', this.evaluator.time, this.evaluator.calcIndepRates())
+    // console.log(' rates at', this.evaluator.time, this.evaluator.calcIndepRates())
     return this.evaluator.calcIndepRates()
   }
 
