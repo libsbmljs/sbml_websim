@@ -20,6 +20,7 @@ export class Websim {
   }
 
   simulateFor(duration) {
-    return this.evaluator.calcIndepRates()
+    const t = this.evaluator.getCurrentTime()
+    return this.ode.solve(t, t+duration)
   }
 }

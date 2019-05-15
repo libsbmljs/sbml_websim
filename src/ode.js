@@ -18,19 +18,26 @@ export class ODE {
   }
 
   solve(t_start, t_end) {
-    this.solver.solve(this.f, t_start, evaluator.getIndepInitialVals(), t_end)
+    this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
   }
 
-  f() {
+  f(x, y) {
     // TODO: use static var?
-    return this.solver.calcIndepRates()
+    // x = time, y = indep. values
+    this.evaluator.time = x
+    for(var k=0, N=this.evaluator.getNumIndepVars(); k<N; k++) {
+      this.evaluator.setIndepValue(k, y[k])
+    }
+    this.evaluator.updateReactionRates()
+    console.log(' rates at', this.evaluator.time, this.evaluator.calcIndepRates())
+    return this.evaluator.calcIndepRates()
   }
 
-  calcReactionRates() {
-    // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
-    for(var k=0, N=this.reaction_ids.length; k<N; k++) {
-      this.reaction_rates[k] = this.evaluator.evaluate(this.reaction_ids[k], false, true)
-      console.log('reaction rate', this.reaction_ids[k], this.reaction_rates[k])
-    }
-  }
+  // calcReactionRates() {
+  //   // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
+  //   for(var k=0, N=this.reaction_ids.length; k<N; k++) {
+  //     this.reaction_rates[k] = this.evaluator.evaluate(this.reaction_ids[k], false, true)
+  //     console.log('reaction rate', this.reaction_ids[k], this.reaction_rates[k])
+  //   }
+  // }
 }

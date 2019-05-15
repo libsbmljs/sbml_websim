@@ -45,11 +45,14 @@ export class Evaluator {
         this.evaluators.set(id, new ParameterEvaluator(parameter, this, model))
       }
       // reactions
+      this.reaction_evals = []
       for (const reaction of model.reactions) {
         if (!reaction.isSetIdAttribute())
           throw new Error('All reactions need ids')
         const id = reaction.getId()
-        this.evaluators.set(id, new ReactionEvaluator(reaction, this, model))
+        const e = new ReactionEvaluator(reaction, this, model)
+        this.evaluators.set(id, e)
+        this.reaction_evals.push(e)
       }
       // species rates
       this.indep_rate_evals = model.species
@@ -109,6 +112,17 @@ export class Evaluator {
     return this.evaluators.get(id).evaluate(this, initial, conc)
   }
 
+  setValue(id, value, initial=false, conc=true) {
+    if (!this.evaluators.has(id))
+      throw new Error('No evaluator for id '+id)
+    this.evaluators.get(id).set(value, this, initial, conc)
+  }
+
+  setIndepValue(k, value, initial=false, conc=true) {
+    console.log('set indep val', this.indep_rate_evals[k].id, value)
+    this.setValue(this.indep_rate_evals[k].id, value, initial, conc)
+  }
+
   evaluateIndepRate(id, initial=false, conc=true) {
     if (!this.indep_rate_evals_map.has(id))
       throw new Error('No evaluator for id '+id)
@@ -125,5 +139,10 @@ export class Evaluator {
 
   getIndepInitialVals() {
     return this.indep_rate_evals.map((e) => this.evaluate(e.id, true, true))
+  }
+
+  updateReactionRates() {
+    for (const e of this.reaction_evals)
+      e.update(this, true)
   }
 }

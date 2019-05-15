@@ -39,7 +39,7 @@ export class ParameterEvaluator extends ComponentEvaluator {
     this.value = this.tree.evaluate(evaluator, true, conc)
   }
 
-  set(value, initial=false, conc=true) {
+  set(value, evaluator, initial=false, conc=true) {
     if (!initial)
       this.value = value
     else

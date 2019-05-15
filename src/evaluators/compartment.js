@@ -33,7 +33,7 @@ export class CompartmentEvaluator extends ComponentEvaluator {
     this.value = this.tree.evaluate(evaluator, true, conc)
   }
 
-  set(value, initial=false, conc=true) {
+  set(value, evaluator, initial=false, conc=true) {
     if (this.is_const)
       throw new Error('Cannot set value of compartment which is const')
     if (!initial)

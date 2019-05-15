@@ -120,13 +120,13 @@ export class SpeciesEvaluator extends ComponentEvaluator {
    console.log('species initial val', this.id, this.value)
  }
 
- set(value, initial=false, conc=true) {
+ set(value, evaluator, initial=false, conc=true) {
    if (this.is_const)
      throw new Error('Cannot set value of species which is const')
    if (this.has_rule)
      throw new Error('Cannot set value of species which has a rate or assignment rule')
    if (!initial)
-     this.value = this.convert(value, evaluator, initial, !this.subs_units, conc)
+     this.value = this.convert(value, this.evaluator, initial, !this.subs_units, conc)
    else
      throw new Error('Cannot set species initial value')
  }
