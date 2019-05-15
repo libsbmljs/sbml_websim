@@ -25,7 +25,7 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 describe('Loading', function () {
   it('Loads an SBML file', (done) => {
     try {
-      loadFromURL('http://localhost:9876/base/models/layout-glycolysis.xml').then((sim) => {
+      loadFromURL('http://localhost:9876/base/models/repressilator.xml').then((sim) => {
         try {
           expect("Hello".length).toEqual(5)
           expect(sim.evaluator.evaluate('ATP', true, true)).toEqual(3)

@@ -42,6 +42,7 @@ export class Time extends SymTree {
 // unary ops
 export class UnaryOperator extends SymTree {
  constructor(operand) {
+   super()
    this.operand = operand
  }
 }
@@ -53,6 +54,16 @@ export class Negation extends UnaryOperator {
 
  evaluate(evaluator, initial=false, conc=true) {
    return -this.operand.evaluate(evaluator, initial, conc)
+ }
+}
+
+export class Logarithm extends UnaryOperator {
+ constructor(operand) {
+   super(operand)
+ }
+
+ evaluate(evaluator, initial=false, conc=true) {
+   return Math.log(this.operand.evaluate(evaluator, initial, conc))
  }
 }
 
@@ -148,7 +159,7 @@ export function FromSBMLMath(ast, k=0) {
     throw new Error('Leaf node overflow')
 
   const libsbml = getLibsbml()
-  // console.log('ast.getType()', ast.getType(), 'libsbml.AST_DIVIDE', libsbml.AST_DIVIDE, 'k', k, 'nchildren', ast.getNumChildren())
+  console.log('ast.getType()', ast.getType(), 'libsbml.AST_FUNCTION_FLOOR', libsbml.AST_FUNCTION_FLOOR, 'k', k, 'nchildren', ast.getNumChildren())
 
   // printAST(ast)
 
@@ -198,6 +209,9 @@ export function FromSBMLMath(ast, k=0) {
       return new Constant(3.14159265359)
     case libsbml.AST_CONSTANT_TRUE:
       return new Constant(1)
+
+    case libsbml.AST_FUNCTION_LN:
+      return new Logarithm(FromSBMLMath(getChild(ast,0)))
     default:
       throw new Error('Unrecognized AST node type'+ast.getType())
   }
