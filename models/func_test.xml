@@ -57,8 +57,16 @@
           <math xmlns="http://www.w3.org/1998/Math/MathML">
             <apply>
               <ci> myfunc </ci>
-              <ci> S1 </ci>
-              <ci> S2 </ci>
+              <apply>
+                <times/>
+                <cn type="integer"> 2 </cn>
+                <ci> S1 </ci>
+              </apply>
+              <apply>
+                <times/>
+                <cn type="integer"> 3 </cn>
+                <ci> S2 </ci>
+              </apply>
               <ci> k1f </ci>
               <ci> k1r </ci>
             </apply>
