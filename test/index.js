@@ -5,40 +5,50 @@ import libsbml from 'libsbmljs_stable'
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 
 describe('Main', function () {
-  // it('Tests the repressilator model', (done) => {
-  //   try {
-  //     loadFromURL('http://localhost:9876/base/models/repressilator.xml').then((sim) => {
-  //       try {
-  //         // initial reaction rates
-  //         expect(sim.evaluator.evaluate('Reaction1', true, true)).toBe(0)
-  //         expect(sim.evaluator.evaluate('Reaction2', true, true)).toBeCloseTo(6.931, 3)
-  //         expect(sim.evaluator.evaluate('Reaction5', true, true)).toBeCloseTo(138.629, 3)
-  //         expect(sim.evaluator.evaluate('Reaction10', true, true)).toBe(30)
-  //         expect(sim.evaluator.evaluate('Reaction11', true, true)).toBe(30)
-  //         expect(sim.evaluator.evaluate('Reaction12', true, true)).toBe(30)
-  //
-  //         // initial species values
-  //         expect(sim.evaluator.evaluate('Y',  true, true)).toBe(20)
-  //
-  //         // initial rates
-  //         expect(sim.evaluator.evaluateIndepRate('PY',  true, true)).toBeCloseTo(138.63, 2)
-  //         expect(sim.evaluator.evaluateIndepRate('Y',  true, true)).toBeCloseTo(23.07, 2)
-  //         expect(sim.evaluator.evaluateIndepRate('X',  true, true)).toBe(30)
-  //         expect(sim.evaluator.evaluateIndepRate('Z',  true, true)).toBe(30)
-  //       } catch(error) {
-  //         fail(error)
-  //         console.log(error.stack)
-  //       } finally {
-  //         done()
-  //       }
-  //     }, (err) => {
-  //       fail('Unable to load model')
-  //     })
-  //   } catch(error) {
-  //     fail(error)
-  //     console.log(error.stack)
-  //   }
-  // })
+  it('Tests the repressilator model', (done) => {
+    try {
+      loadFromURL('http://localhost:9876/base/models/repressilator.xml').then((sim) => {
+        try {
+          // initial reaction rates
+          expect(sim.evaluator.evaluate('Reaction1', true, true)).toBe(0)
+          expect(sim.evaluator.evaluate('Reaction2', true, true)).toBeCloseTo(6.931, 3)
+          expect(sim.evaluator.evaluate('Reaction5', true, true)).toBeCloseTo(138.629, 3)
+          expect(sim.evaluator.evaluate('Reaction10', true, true)).toBe(30)
+          expect(sim.evaluator.evaluate('Reaction11', true, true)).toBe(30)
+          expect(sim.evaluator.evaluate('Reaction12', true, true)).toBe(30)
+
+          // initial species values
+          expect(sim.evaluator.evaluate('Y',  true, true)).toBe(20)
+
+          // initial rates
+          expect(sim.evaluator.evaluateIndepRate('PY',  true, true)).toBeCloseTo(138.63, 2)
+          expect(sim.evaluator.evaluateIndepRate('Y',  true, true)).toBeCloseTo(23.07, 2)
+          expect(sim.evaluator.evaluateIndepRate('X',  true, true)).toBe(30)
+          expect(sim.evaluator.evaluateIndepRate('Z',  true, true)).toBe(30)
+
+          // test results of simulation
+          sim.simulateFor(100)
+          // console.log('X at 100', sim.evaluator.evaluate('X', false, true))
+          expect(sim.evaluator.evaluate('X', false, true)).toBeCloseTo(7.35, 2)
+          expect(sim.evaluator.evaluate('Y', false, true)).toBeCloseTo(3.48, 2)
+          expect(sim.evaluator.evaluate('Z', false, true)).toBeCloseTo(0.19, 2)
+          expect(sim.evaluator.evaluate('PX', false, true)).toBeCloseTo(289, 0)
+          expect(sim.evaluator.evaluate('PY', false, true)).toBeCloseTo(1038, 0)
+          expect(sim.evaluator.evaluate('PZ', false, true)).toBeCloseTo(114, 0)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
+  })
   //
   // it('Tests the glycolysis model', (done) => {
   //   try {
@@ -78,42 +88,43 @@ describe('Main', function () {
   //   }
   // })
   //
-  // it('Tests compartment math', (done) => {
-  //   try {
-  //     loadFromURL('http://localhost:9876/base/models/comp_test.xml').then((sim) => {
-  //       try {
-  //         // initial reaction rates
-  //         expect(sim.evaluator.evaluate('J0', true, true)).toBe(100)
-  //         expect(sim.evaluator.evaluate('J1', true, true)).toBe(0)
-  //
-  //         // initial species values
-  //         expect(sim.evaluator.evaluate('A', true, true)).toBe(10)
-  //         expect(sim.evaluator.evaluate('B', true, true)).toBe(0)
-  //         expect(sim.evaluator.evaluate('C', true, true)).toBe(0)
-  //
-  //         // initial rates
-  //         expect(sim.evaluator.evaluateIndepRate('A',  true, true)).toBe(-100)
-  //         expect(sim.evaluator.evaluateIndepRate('B',  true, true)).toBe(50)
-  //         expect(sim.evaluator.evaluateIndepRate('C',  true, true)).toBe(0)
-  //
-  //         sim.simulateFor(1)
-  //         expect(sim.evaluator.evaluate('A', false, true)).toBeCloseTo(0.30, 2)
-  //         expect(sim.evaluator.evaluate('B', false, true)).toBeCloseTo(0.59, 2)
-  //         expect(sim.evaluator.evaluate('C', false, true)).toBeCloseTo(4.26, 2)
-  //       } catch(error) {
-  //         fail(error)
-  //         console.log(error.stack)
-  //       } finally {
-  //         done()
-  //       }
-  //     }, (err) => {
-  //       fail('Unable to load model')
-  //     })
-  //   } catch(error) {
-  //     fail(error)
-  //     console.log(error.stack)
-  //   }
-  // })
+  it('Tests compartment math', (done) => {
+    try {
+      loadFromURL('http://localhost:9876/base/models/comp_test.xml').then((sim) => {
+        try {
+          // initial reaction rates
+          expect(sim.evaluator.evaluate('J0', true, true)).toBe(100)
+          expect(sim.evaluator.evaluate('J1', true, true)).toBe(0)
+
+          // initial species values
+          expect(sim.evaluator.evaluate('A', true, true)).toBe(10)
+          expect(sim.evaluator.evaluate('B', true, true)).toBe(0)
+          expect(sim.evaluator.evaluate('C', true, true)).toBe(0)
+
+          // initial rates
+          expect(sim.evaluator.evaluateIndepRate('A',  true, true)).toBe(-100)
+          expect(sim.evaluator.evaluateIndepRate('B',  true, true)).toBe(50)
+          expect(sim.evaluator.evaluateIndepRate('C',  true, true)).toBe(0)
+
+          // test results of simulation
+          sim.simulateFor(1)
+          expect(sim.evaluator.evaluate('A', false, true)).toBeCloseTo(0.30, 2)
+          expect(sim.evaluator.evaluate('B', false, true)).toBeCloseTo(0.59, 2)
+          expect(sim.evaluator.evaluate('C', false, true)).toBeCloseTo(4.26, 2)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
+  })
 
   it('Tests function evaluations', (done) => {
     try {
@@ -130,6 +141,7 @@ describe('Main', function () {
           expect(sim.evaluator.evaluateIndepRate('S1',  true, true)).toBe(-200)
           expect(sim.evaluator.evaluateIndepRate('S2',  true, true)).toBe(200)
 
+          // test results of simulation
           sim.simulateFor(1)
           expect(sim.evaluator.evaluate('S1', false, true)).toBeCloseTo(4.29, 2)
           expect(sim.evaluator.evaluate('S2', false, true)).toBeCloseTo(5.71, 2)

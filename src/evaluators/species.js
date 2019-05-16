@@ -126,7 +126,7 @@ export class SpeciesEvaluator extends ComponentEvaluator {
    if (this.has_rule)
      throw new Error('Cannot set value of species which has a rate or assignment rule')
    if (!initial)
-     this.value = this.convert(value, this.evaluator, initial, !this.subs_units, conc)
+     this.value = this.convert(value, evaluator, initial, !this.subs_units, conc)
    else
      throw new Error('Cannot set species initial value')
  }
