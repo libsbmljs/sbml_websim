@@ -1,4 +1,5 @@
 import { range } from 'lodash'
+import math from 'mathjs'
 
 import { getLibsbml } from './libsbml.js'
 
