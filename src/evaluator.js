@@ -58,13 +58,14 @@ export class Evaluator {
         this.reaction_evals.push(e)
       }
       // functions
-      this.reaction_evals = []
-      for (const func of range(model.getNumFunctionDefinitions()).map((k) => model.getFunctionDefinition(k))) {
-        if (!func.isSetIdAttribute())
-          throw new Error('All reactions need ids')
-        const id = func.getId()
-        const e = new FunctionEvaluator(func, this, model)
-      }
+      this.function_evaluators = new Map(range(model.getNumFunctionDefinitions())
+        .map((k) => model.getFunctionDefinition(k))
+        .map((func) => {
+          if (!func.isSetIdAttribute())
+            throw new Error('All functions need ids')
+          const id = func.getId()
+          return [id, new FunctionEvaluator(func, this, model)]
+        }))
       // species rates
       this.indep_rate_evals = model.species
         .filter((species) => this.evaluators.get(species.getId()).isIndependent())
@@ -157,8 +158,8 @@ export class Evaluator {
   }
 
   evaluateFunction(id, args, initial=false, conc=true) {
-    if (!this.functionEvaluators.has(id))
+    if (!this.function_evaluators.has(id))
       throw new Error('No evaluator for function '+id)
-    return this.functionEvaluators.get(id).evaluate(this, args, initial, conc)
+    return this.function_evaluators.get(id).evaluate(this, args, initial, conc)
   }
 }

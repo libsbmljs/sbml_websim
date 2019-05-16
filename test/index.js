@@ -120,19 +120,19 @@ describe('Main', function () {
       loadFromURL('http://localhost:9876/base/models/func_test.xml').then((sim) => {
         try {
           // initial reaction rates
-          expect(sim.evaluator.evaluate('J0', true, true)).toBe(100)
+          expect(sim.evaluator.evaluate('J0', true, true)).toBe(200)
 
           // initial species values
           expect(sim.evaluator.evaluate('S1', true, true)).toBe(10)
           expect(sim.evaluator.evaluate('S2', true, true)).toBe(0)
 
           // initial rates
-          expect(sim.evaluator.evaluateIndepRate('S1',  true, true)).toBe(-100)
-          expect(sim.evaluator.evaluateIndepRate('S2',  true, true)).toBe(100)
+          expect(sim.evaluator.evaluateIndepRate('S1',  true, true)).toBe(-200)
+          expect(sim.evaluator.evaluateIndepRate('S2',  true, true)).toBe(200)
 
           sim.simulateFor(1)
-          expect(sim.evaluator.evaluate('S1', false, true)).toBeCloseTo(6.67, 2)
-          expect(sim.evaluator.evaluate('S2', false, true)).toBeCloseTo(3.33, 2)
+          expect(sim.evaluator.evaluate('S1', false, true)).toBeCloseTo(4.29, 2)
+          expect(sim.evaluator.evaluate('S2', false, true)).toBeCloseTo(5.71, 2)
         } catch(error) {
           fail(error)
           console.log(error.stack)

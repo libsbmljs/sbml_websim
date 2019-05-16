@@ -74,45 +74,45 @@ export class SpeciesEvaluator extends ComponentEvaluator {
    }
  }
 
- convertToConc(value, evaluator, initial, conc) {
+ convertToConc(value, evaluator, initial, conc, bvars) {
    if (conc === true)
      return value
    else {
      if (this.compartment === null)
        throw new Error('Cannot convert if compartment not set')
-     return value*evaluator.evaluate(this.compartment, initial, conc)
+     return value*evaluator.evaluate(this.compartment, initial, conc, bvars)
    }
  }
 
- convertToAmt(value, evaluator, initial, conc) {
+ convertToAmt(value, evaluator, initial, conc, bvars) {
    if (conc === false)
      return value
    else {
      if (this.compartment === null)
        throw new Error('Cannot convert if compartment not set')
-     const c = evaluator.evaluate(this.compartment, initial, conc)
+     const c = evaluator.evaluate(this.compartment, initial, conc, bvars)
      if (c === 0)
        throw new Error('Compartment size zero')
      return value/c
    }
  }
 
- convert(value, evaluator, initial, is_conc, to_conc) {
+ convert(value, evaluator, initial, is_conc, to_conc, bvars) {
    if (to_conc)
-     return this.convertToConc(value, evaluator, initial, is_conc)
+     return this.convertToConc(value, evaluator, initial, is_conc, bvars)
    else
-     return this.convertToAmt(value, evaluator, initial, is_conc)
+     return this.convertToAmt(value, evaluator, initial, is_conc, bvars)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
+ evaluate(evaluator, initial=false, conc=true, bvars = null) {
    if (initial)
      return this.convert(
-       this.tree.evaluate(evaluator, initial, conc),
-       evaluator, initial, !this.subs_units, conc)
+       this.tree.evaluate(evaluator, initial, conc, bvars),
+       evaluator, initial, !this.subs_units, conc, bvars)
    else
      return this.convert(
        this.value,
-       evaluator, initial, !this.subs_units, conc)
+       evaluator, initial, !this.subs_units, conc, bvars)
  }
 
  initialize(evaluator, conc=true) {

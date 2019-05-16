@@ -21,9 +21,9 @@ export class ReactionEvaluator extends ComponentEvaluator {
     this.value = null
   }
 
-  evaluate(evaluator, initial=false, conc=true) {
+  evaluate(evaluator, initial=false, conc=true, bvars = null) {
     if (initial)
-      return this.tree.evaluate(evaluator, initial, conc)
+      return this.tree.evaluate(evaluator, initial, conc, bvars)
     else {
       return this.value
     }

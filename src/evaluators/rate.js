@@ -95,11 +95,11 @@ export class RateEvaluator extends EvaluatorBase {
    // this.value = null
   }
 
-  evaluate(evaluator, initial=false, conc=true) {
+  evaluate(evaluator, initial=false, conc=true, bvars = null) {
     // if (initial)
     // if (conc === false)
       // throw new Error('Eval species rate amounts not supported')
-    return this.tree.evaluate(evaluator, initial, conc)
+    return this.tree.evaluate(evaluator, initial, conc, bvars)
      // else {
      //   return this.value
      // }

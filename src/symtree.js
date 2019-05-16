@@ -14,7 +14,7 @@ export class Constant extends SymTree {
     this.value = value
   }
 
-  evaluate(evaluator, initial=false, conc=true) {
+  evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return this.value
   }
 }
@@ -26,8 +26,11 @@ export class Symbol extends SymTree {
     this.symbol = symbol
   }
 
-  evaluate(evaluator, initial=false, conc=true) {
-    return evaluator.evaluate(this.symbol, initial, conc)
+  evaluate(evaluator, initial=false, conc=true, bvars=null) {
+    if (bvars !== null && bvars.has(this.symbol))
+      return bvars.get(this.symbol)
+    else
+      return evaluator.evaluate(this.symbol, initial, conc, bvars)
   }
 }
 
@@ -36,7 +39,7 @@ export class Time extends SymTree {
     super()
   }
 
-  evaluate(evaluator, initial=false, conc=true) {
+  evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return evaluator.getCurrentTime()
   }
 }
@@ -54,8 +57,8 @@ export class Negation extends UnaryOperator {
    super(operand)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
-   return -this.operand.evaluate(evaluator, initial, conc)
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
+   return -this.operand.evaluate(evaluator, initial, conc, bvars)
  }
 }
 
@@ -64,8 +67,8 @@ export class Logarithm extends UnaryOperator {
    super(operand)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
-   return Math.log(this.operand.evaluate(evaluator, initial, conc))
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
+   return Math.log(this.operand.evaluate(evaluator, initial, conc, bvars))
  }
 }
 
@@ -84,9 +87,9 @@ export class Product extends BinaryOperator {
    super(lhs, rhs)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
-   return this.lhs.evaluate(evaluator, initial, conc) *
-          this.rhs.evaluate(evaluator, initial, conc)
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
+   return this.lhs.evaluate(evaluator, initial, conc, bvars) *
+          this.rhs.evaluate(evaluator, initial, conc, bvars)
  }
 }
 
@@ -95,9 +98,9 @@ export class Quotient extends BinaryOperator {
    super(lhs, rhs)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
-   return this.lhs.evaluate(evaluator, initial, conc) /
-          this.rhs.evaluate(evaluator, initial, conc)
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
+   return this.lhs.evaluate(evaluator, initial, conc, bvars) /
+          this.rhs.evaluate(evaluator, initial, conc, bvars)
  }
 }
 
@@ -106,9 +109,9 @@ export class Sum extends BinaryOperator {
    super(lhs, rhs)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
-   return this.lhs.evaluate(evaluator, initial, conc) +
-          this.rhs.evaluate(evaluator, initial, conc)
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
+   return this.lhs.evaluate(evaluator, initial, conc, bvars) +
+          this.rhs.evaluate(evaluator, initial, conc, bvars)
  }
 }
 
@@ -117,9 +120,9 @@ export class Difference extends BinaryOperator {
    super(lhs, rhs)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
-   return this.lhs.evaluate(evaluator, initial, conc) -
-          this.rhs.evaluate(evaluator, initial, conc)
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
+   return this.lhs.evaluate(evaluator, initial, conc, bvars) -
+          this.rhs.evaluate(evaluator, initial, conc, bvars)
  }
 }
 
@@ -128,10 +131,10 @@ export class Exponentiation extends BinaryOperator {
    super(lhs, rhs)
  }
 
- evaluate(evaluator, initial=false, conc=true) {
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
    return Math.pow(
-          this.lhs.evaluate(evaluator, initial, conc),
-          this.rhs.evaluate(evaluator, initial, conc))
+          this.lhs.evaluate(evaluator, initial, conc, bvars),
+          this.rhs.evaluate(evaluator, initial, conc, bvars))
  }
 }
 
@@ -144,10 +147,10 @@ export class FunctionCall extends SymTree {
    this.args = args
  }
 
- evaluate(evaluator, initial=false, conc=true) {
+ evaluate(evaluator, initial=false, conc=true, bvars=null) {
    return evaluator.evaluateFunction(
      this.symbol,
-     this.args.map((a) => a.evaluate(evaluator, initial, conc)),
+     this.args.map((a) => a.evaluate(evaluator, initial, conc, bvars)),
      initial,
      conc)
  }
@@ -224,7 +227,7 @@ function getChild(ast, k) {
     throw new Error('Child node overflow')
 }
 
-export function FromSBMLMath(ast, k=0, bvars = null) {
+export function FromSBMLMath(ast, k=0) {
   if (ast.getNumChildren() > 0 && k+1 > ast.getNumChildren())
     throw new Error('Leaf node overflow')
 
@@ -236,30 +239,30 @@ export function FromSBMLMath(ast, k=0, bvars = null) {
   switch(ast.getType()) {
     case libsbml.AST_PLUS:
       if (k+2 === ast.getNumChildren())
-        return new Sum(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(getChild(ast, k+1), 0, bvars))
+        return new Sum(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
-        return new Sum(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(ast, k+1, bvars))
+        return new Sum(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_MINUS:
       if (k+2 === ast.getNumChildren())
-        return new Difference(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(getChild(ast, k+1), 0, bvars))
+        return new Difference(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
-        return new Difference(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(ast, k+1, bvars))
+        return new Difference(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_TIMES:
       if (k+2 === ast.getNumChildren())
-        return new Product(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(getChild(ast, k+1), 0, bvars))
+        return new Product(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
-        return new Product(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(ast, k+1, bvars))
+        return new Product(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_DIVIDE:
       if (k+2 === ast.getNumChildren())
-        return new Quotient(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(getChild(ast, k+1), 0, bvars))
+        return new Quotient(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
-        return new Quotient(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(ast, k+1, bvars))
+        return new Quotient(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_POWER:
     case libsbml.AST_FUNCTION_POWER:
       if (k+2 === ast.getNumChildren())
-        return new Exponentiation(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(getChild(ast, k+1), 0, bvars))
+        return new Exponentiation(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
-        return new Exponentiation(FromSBMLMath(getChild(ast, k), 0, bvars), FromSBMLMath(ast, k+1, bvars))
+        return new Exponentiation(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_INTEGER:
     case libsbml.AST_REAL:
     case libsbml.AST_REAL_E:
@@ -267,10 +270,7 @@ export function FromSBMLMath(ast, k=0, bvars = null) {
       return new Constant(ast.getValue())
     case libsbml.AST_NAME:
       const name = ast.getName()
-      if (bvars !== null && bvars.has(name))
-        return bvars.get(name)
-      else
-        return new Symbol(name)
+      return new Symbol(name)
     // case libsbml.AST_NAME_AVOGADRO:
     case libsbml.AST_NAME_TIME:
       return new Time()
@@ -284,13 +284,13 @@ export function FromSBMLMath(ast, k=0, bvars = null) {
       return new Constant(1)
 
     case libsbml.AST_FUNCTION_LN:
-      return new Logarithm(FromSBMLMath(getChild(ast,0), 0, bvars))
+      return new Logarithm(FromSBMLMath(getChild(ast,0)))
 
     case libsbml.AST_FUNCTION:
     case libsbml.AST_CSYMBOL_FUNCTION:
       const fname = ast.getName()
       console.log('function name', fname)
-      const args = range(ast.getNumChildren()).map((k) => FromSBMLMath(getChild(ast, k), 0, bvars))
+      const args = range(ast.getNumChildren()).map((k) => FromSBMLMath(getChild(ast, k)))
       return new FunctionCall(fname, args)
     default:
       throw new Error('Unrecognized AST node type'+ast.getType())

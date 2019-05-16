@@ -33,13 +33,20 @@ export class FunctionEvaluator extends ComponentEvaluator {
       const body = func.getBody()
       // console.log('function body for', this.id)
       // printAST(body)
-      this.tree = FromSBMLMath(kinetic_law.getMath())
+      this.tree = FromSBMLMath(body, 0, )
     } else {
       throw new Error('No function body')
     }
   }
 
-  evaluate(evaluator, initial=false, conc=true) {
-    return this.tree.evaluate(evaluator, initial, conc)
+  evaluate(evaluator, args, initial=false, conc=true) {
+    return this.tree.evaluate(
+      evaluator,
+      initial,
+      conc,
+      new Map(
+        Array.from(args.entries())
+        .map(([k,v]) => [this.argmap.get(k), v]))
+      )
   }
 }
