@@ -1,7 +1,10 @@
+import { range } from 'lodash'
+
 import { CompartmentEvaluator } from './evaluators/compartment.js'
 import { SpeciesEvaluator } from './evaluators/species.js'
 import { ReactionEvaluator } from './evaluators/reaction.js'
 import { ParameterEvaluator } from './evaluators/parameter.js'
+import { FunctionEvaluator } from './evaluators/function.js'
 import { RateEvaluator } from './evaluators/rate.js'
 
 function isComponentIn(component, components) {
@@ -53,6 +56,14 @@ export class Evaluator {
         const e = new ReactionEvaluator(reaction, this, model)
         this.evaluators.set(id, e)
         this.reaction_evals.push(e)
+      }
+      // functions
+      this.reaction_evals = []
+      for (const func of range(model.getNumFunctionDefinitions()).map((k) => model.getFunctionDefinition(k))) {
+        if (!func.isSetIdAttribute())
+          throw new Error('All reactions need ids')
+        const id = func.getId()
+        const e = new FunctionEvaluator(func, this, model)
       }
       // species rates
       this.indep_rate_evals = model.species
@@ -143,5 +154,11 @@ export class Evaluator {
   updateReactionRates() {
     for (const e of this.reaction_evals)
       e.update(this, true)
+  }
+
+  evaluateFunction(id, args, initial=false, conc=true) {
+    if (!this.functionEvaluators.has(id))
+      throw new Error('No evaluator for function '+id)
+    return this.functionEvaluators.get(id).evaluate(this, args, initial, conc)
   }
 }
