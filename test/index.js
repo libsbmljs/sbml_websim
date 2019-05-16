@@ -49,45 +49,60 @@ describe('Main', function () {
       console.log(error.stack)
     }
   })
-  //
-  // it('Tests the glycolysis model', (done) => {
-  //   try {
-  //     loadFromURL('http://localhost:9876/base/models/layout-glycolysis.xml').then((sim) => {
-  //       try {
-  //         // initial reaction rates
-  //         expect(sim.evaluator.evaluate('J0', true, true)).toBe(50)
-  //         expect(sim.evaluator.evaluate('J9', true, true)).toBe(84)
-  //         for (const r of ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8', 'J10'])
-  //           expect(sim.evaluator.evaluate(r, true, true)).toBe(0)
-  //
-  //         // initial species values
-  //         expect(sim.evaluator.evaluate('Glucose',  true, true)).toBe(0)
-  //         expect(sim.evaluator.evaluate('ATP',  true, true)).toBe(3)
-  //         expect(sim.evaluator.evaluate('ADP',  true, true)).toBe(1)
-  //         expect(sim.evaluator.evaluate('NAD',  true, true)).toBe(0.5)
-  //         expect(sim.evaluator.evaluate('NADH', true, true)).toBe(0.5)
-  //         // console.log('ATP amt', sim.evaluator.evaluate('ATP', true, false))
-  //
-  //         // initial rates
-  //         expect(sim.evaluator.evaluateIndepRate('Glucose',  true, true)).toBe(50)
-  //         expect(sim.evaluator.evaluateIndepRate('ATP',  true, true)).toBe(-84)
-  //         expect(sim.evaluator.evaluateIndepRate('ADP',  true, true)).toBe(84)
-  //         expect(() => sim.evaluator.evaluateIndepRate('External_glucose',  true, true)).toThrow() // boundary
-  //       } catch(error) {
-  //         fail(error)
-  //         console.log(error.stack)
-  //       } finally {
-  //         done()
-  //       }
-  //     }, (err) => {
-  //       fail('Unable to load model')
-  //     })
-  //   } catch(error) {
-  //     fail(error)
-  //     console.log(error.stack)
-  //   }
-  // })
-  //
+
+  it('Tests the glycolysis model', (done) => {
+    try {
+      loadFromURL('http://localhost:9876/base/models/layout-glycolysis.xml').then((sim) => {
+        try {
+          // initial reaction rates
+          expect(sim.evaluator.evaluate('J0', true, true)).toBe(50)
+          expect(sim.evaluator.evaluate('J9', true, true)).toBe(84)
+          for (const r of ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'J8', 'J10'])
+            expect(sim.evaluator.evaluate(r, true, true)).toBe(0)
+
+          // initial species values
+          expect(sim.evaluator.evaluate('Glucose',  true, true)).toBe(0)
+          expect(sim.evaluator.evaluate('ATP',  true, true)).toBe(3)
+          expect(sim.evaluator.evaluate('ADP',  true, true)).toBe(1)
+          expect(sim.evaluator.evaluate('NAD',  true, true)).toBe(0.5)
+          expect(sim.evaluator.evaluate('NADH', true, true)).toBe(0.5)
+          // console.log('ATP amt', sim.evaluator.evaluate('ATP', true, false))
+
+          // initial rates
+          expect(sim.evaluator.evaluateIndepRate('Glucose',  true, true)).toBe(50)
+          expect(sim.evaluator.evaluateIndepRate('ATP',  true, true)).toBe(-84)
+          expect(sim.evaluator.evaluateIndepRate('ADP',  true, true)).toBe(84)
+          expect(() => sim.evaluator.evaluateIndepRate('External_glucose',  true, true)).toThrow() // boundary
+
+
+          // test results of simulation
+          sim.simulateFor(0.2)
+          expect(sim.evaluator.evaluate('Glucose', false, true)).toBeCloseTo(6.69, 2)
+          expect(sim.evaluator.evaluate('fructose_1_6_bisphosphate', false, true)).toBeCloseTo(1.38, 2)
+          expect(sim.evaluator.evaluate('glyceraldehyde_3_phosphate', false, true)).toBeCloseTo(0.16, 2)
+          expect(sim.evaluator.evaluate('glycerate_3_phosphate', false, true)).toBeCloseTo(0.06, 2)
+          expect(sim.evaluator.evaluate('pyruvate', false, true)).toBeCloseTo(1.23, 2)
+          expect(sim.evaluator.evaluate('Acetyladehyde', false, true)).toBeCloseTo(0.01, 2)
+          expect(sim.evaluator.evaluate('External_acetaldehyde', false, true)).toBeCloseTo(0.01, 2)
+          expect(sim.evaluator.evaluate('ATP', false, true)).toBeCloseTo(0.004, 3)
+          expect(sim.evaluator.evaluate('ADP', false, true)).toBeCloseTo(4.00, 2)
+          expect(sim.evaluator.evaluate('NAD', false, true)).toBeCloseTo(0.41, 2)
+          expect(sim.evaluator.evaluate('NADH', false, true)).toBeCloseTo(0.59, 2)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
+  })
+
   it('Tests compartment math', (done) => {
     try {
       loadFromURL('http://localhost:9876/base/models/comp_test.xml').then((sim) => {
