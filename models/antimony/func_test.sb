@@ -1,0 +1,14 @@
+function myfunc(A, B, kf, kr)
+  kf*A - kr*B
+end
+
+model func_test()
+  compartment C = 1
+  var species S1 in C = 10
+  var species S2 in C = 0
+
+  J0: S1 -> S2; myfunc(2*S1, 3*S2, k1f, k1r)
+
+  k1f = 10
+  k1r = 5
+end
