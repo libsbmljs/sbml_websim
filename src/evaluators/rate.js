@@ -34,13 +34,36 @@ function appendToTree(newtree, tree, invert=false) {
   }
 }
 
-// *** Species rate of change ***
 export class RateEvaluator extends EvaluatorBase {
+  constructor() {
+    super()
+  }
+
+  evaluate(evaluator, initial=false, conc=true, bvars = null) {
+    return this.tree.evaluate(evaluator, initial, conc, bvars)
+  }
+
+  initialize(evaluator, conc=true) {
+    console.log('rate', this.id, this.evaluate(evaluator, true, true))
+  }
+
+  getQuantityDesignator() {
+    return this.id
+  }
+
+  getQuantityDisplayName() {
+    return this.name
+  }
+}
+
+// *** Species rate of change ***
+export class SpeciesRateEvaluator extends RateEvaluator {
   constructor(species, evaluator, model) {
     if (!species.isSetIdAttribute())
       throw new Error('No id set for species')
     super()
     this.id = species.getId()
+    this.name = '['+(species.isSetName() ? species.getName() : this.id)+']'
     this.tree = null
 
     // boundary species
@@ -91,29 +114,31 @@ export class RateEvaluator extends EvaluatorBase {
       this.tree = new Constant(0)
     else if (species.isSetCompartment())
       this.tree = new Quotient(this.tree, new Symbol(species.getCompartment()))
-
-   // this.value = null
   }
 
-  evaluate(evaluator, initial=false, conc=true, bvars = null) {
-    // if (initial)
-    // if (conc === false)
-      // throw new Error('Eval species rate amounts not supported')
-    return this.tree.evaluate(evaluator, initial, conc, bvars)
-     // else {
-     //   return this.value
-     // }
+  getQuantityDesignator() {
+    return '['+this.id+']'
   }
+}
 
-  initialize(evaluator, conc=true) {
-    // this.value = this.tree.evaluate(evaluator, true, conc)
-    console.log('species rate', this.id, this.evaluate(evaluator, true, true))
+// *** Component (parameter, compartment) with rate rule ***
+export class RateRuleEvaluator extends RateEvaluator {
+  constructor(component, evaluator, model) {
+    if (!component.isSetIdAttribute())
+      throw new Error('No id set for rate rule component')
+    super()
+    this.id = component.getId()
+    this.name = component.isSetName() ? component.getName() : this.id
+    this.tree = null
+
+    for (const rule of model.rules) {
+      if (rule.isRate() && rule.isSetVariable() &&
+          rule .getVariable() === this.id && rule.isSetMath()) {
+        this.tree = FromSBMLMath(rule.getMath())
+      }
+    }
+
+    if (this.tree === null)
+      this.tree = new Constant(0)
   }
-
- // set(value, initial=false, conc=true) {
- //   if (!initial)
- //     this.value = value
- //   else
- //     throw new Error('Cannot set reaction initial value')
- // }
 }

@@ -5,7 +5,7 @@ import { SpeciesEvaluator } from './evaluators/species.js'
 import { ReactionEvaluator } from './evaluators/reaction.js'
 import { ParameterEvaluator } from './evaluators/parameter.js'
 import { FunctionEvaluator } from './evaluators/function.js'
-import { RateEvaluator } from './evaluators/rate.js'
+import { SpeciesRateEvaluator, RateRuleEvaluator } from './evaluators/rate.js'
 
 function isComponentIn(component, components) {
   if (!component.isSetIdAttribute())
@@ -23,6 +23,20 @@ function isCompartment(component, model) {
 
 function isReaction(component, model) {
   return isComponentIn(component, model.reactions)
+}
+
+function hasRateRule(component, model) {
+  if (!component.isSetIdAttribute())
+    throw new Error('No id set for component')
+  const id = component.getId()
+
+  for (const rule of model.rules) {
+    if (rule.isRate() && rule.isSetVariable() &&
+        rule .getVariable() === id && rule.isSetMath()) {
+      return true
+    }
+  }
+  return false
 }
 
 export class Evaluator {
@@ -66,12 +80,22 @@ export class Evaluator {
           const id = func.getId()
           return [id, new FunctionEvaluator(func, this, model)]
         }))
-      // species rates
+      // independent rates (non-const species and parameters)
       this.indep_rate_evals = model.species
         .filter((species) => this.evaluators.get(species.getId()).isIndependent())
         .map((species) =>
-        new RateEvaluator(species, this, model)
-      )
+        new SpeciesRateEvaluator(species, this, model)
+      ).concat(
+        model.parameters
+        .filter((parameter) => hasRateRule(parameter, model))
+        .map((parameter) =>
+        new RateRuleEvaluator(parameter, this, model)
+      ),
+        model.compartments
+        .filter((compartment) => hasRateRule(compartment, model))
+        .map((compartment) =>
+        new RateRuleEvaluator(compartment, this, model)
+      ))
       this.indep_rate_evals_map = new Map(this.indep_rate_evals.map((e) => [e.id, e]))
       this.initialize()
     } catch(error) {
@@ -113,9 +137,9 @@ export class Evaluator {
     for (const [id, evaluator] of this.evaluators) {
       evaluator.initialize(this)
     }
-      for (const evaluator of this.indep_rate_evals) {
-        evaluator.initialize(this)
-      }
+    // for (const evaluator of this.indep_rate_evals) {
+    //   evaluator.initialize(this)
+    // }
   }
 
   evaluate(id, initial=false, conc=true) {

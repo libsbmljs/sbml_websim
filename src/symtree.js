@@ -244,6 +244,9 @@ export function FromSBMLMath(ast, k=0) {
       else
         return new Sum(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
     case libsbml.AST_MINUS:
+      if (ast.getNumChildren() === 1)
+         // unary minus
+         return new Negation(FromSBMLMath(getChild(ast,0)))
       if (k+2 === ast.getNumChildren())
         return new Difference(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else

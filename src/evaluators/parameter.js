@@ -16,6 +16,11 @@ export class ParameterEvaluator extends ComponentEvaluator {
         this.value = null
         return
       }
+      else if (rule.isRate() && rule.isSetVariable() &&
+          rule .getVariable() === this.id && rule.isSetMath()) {
+        // parameter is set by a rate rule
+        this.value = null
+      }
     }
 
     // if the value isn't set by a rule, just use the sbml attribute

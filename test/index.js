@@ -174,4 +174,38 @@ describe('Main', function () {
       console.log(error.stack)
     }
   })
+
+  it('Tests variable parameters', (done) => {
+    try {
+      loadFromURL('http://localhost:9876/base/models/param_test.xml').then((sim) => {
+        try {
+          // initial reaction rates
+          expect(sim.evaluator.evaluate('J0', true, true)).toBe(10)
+
+          // initial species values
+          expect(sim.evaluator.evaluate('S', true, true)).toBe(10)
+          expect(sim.evaluator.evaluate('k', true, true)).toBe(1)
+
+          // initial rates
+          expect(sim.evaluator.evaluateIndepRate('S',  true, true)).toBe(-10)
+          expect(sim.evaluator.evaluateIndepRate('k',  true, true)).toBe(-1)
+
+          // test results of simulation
+          sim.simulateFor(10)
+          expect(sim.evaluator.evaluate('S', false, true)).toBeCloseTo(3.68, 2)
+          expect(sim.evaluator.evaluate('k', false, true)*10e3).toBeCloseTo(1, 0)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
+  })
 })

@@ -1,0 +1,10 @@
+model param_test
+  var k
+  var species S
+
+  k' = -k
+  J0: S -> ; k*S
+
+  k=1
+  S=10
+end
