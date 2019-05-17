@@ -43,9 +43,9 @@ export class RateEvaluator extends EvaluatorBase {
     return this.tree.evaluate(evaluator, initial, conc, bvars)
   }
 
-  initialize(evaluator, conc=true) {
-    console.log('rate', this.id, this.evaluate(evaluator, true, true))
-  }
+  // initialize(evaluator, conc=true) {
+  //   console.log('rate', this.id, this.evaluate(evaluator, true, true))
+  // }
 
   getQuantityDesignator() {
     return this.id

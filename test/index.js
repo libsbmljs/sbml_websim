@@ -208,4 +208,49 @@ describe('Main', function () {
       console.log(error.stack)
     }
   })
+
+  it('Tests the COPASI repressilator model', (done) => {
+    try {
+      loadFromURL('http://localhost:9876/base/models/repressilator-copasi.xml').then((sim) => {
+        try {
+          // initial reaction rates
+          expect(sim.evaluator.evaluate('Reaction1', true, true)).toBe(0)
+          expect(sim.evaluator.evaluate('Reaction2', true, true)).toBeCloseTo(6.931, 3)
+          expect(sim.evaluator.evaluate('Reaction5', true, true)).toBeCloseTo(138.629, 3)
+          expect(sim.evaluator.evaluate('Reaction10', true, true)).toBe(30)
+          expect(sim.evaluator.evaluate('Reaction11', true, true)).toBe(30)
+          expect(sim.evaluator.evaluate('Reaction12', true, true)).toBe(30)
+
+          // initial species values
+          expect(sim.evaluator.evaluate('Y',  true, true)).toBe(20)
+
+          // initial rates
+          expect(sim.evaluator.evaluateIndepRate('PY',  true, true)).toBeCloseTo(138.63, 2)
+          expect(sim.evaluator.evaluateIndepRate('Y',  true, true)).toBeCloseTo(23.07, 2)
+          expect(sim.evaluator.evaluateIndepRate('X',  true, true)).toBe(30)
+          expect(sim.evaluator.evaluateIndepRate('Z',  true, true)).toBe(30)
+
+          // test results of simulation
+          sim.simulateFor(100)
+          // console.log('X at 100', sim.evaluator.evaluate('X', false, true))
+          expect(sim.evaluator.evaluate('X', false, true)).toBeCloseTo(7.35, 2)
+          expect(sim.evaluator.evaluate('Y', false, true)).toBeCloseTo(3.48, 2)
+          expect(sim.evaluator.evaluate('Z', false, true)).toBeCloseTo(0.19, 2)
+          expect(sim.evaluator.evaluate('PX', false, true)).toBeCloseTo(289, 0)
+          expect(sim.evaluator.evaluate('PY', false, true)).toBeCloseTo(1038, 0)
+          expect(sim.evaluator.evaluate('PZ', false, true)).toBeCloseTo(114, 0)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
+  })
 })

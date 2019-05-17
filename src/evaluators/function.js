@@ -24,15 +24,9 @@ export class FunctionEvaluator extends ComponentEvaluator {
     this.argmap = new Map(
       range(func.getNumArguments()).map((k) => [k, decodeArg(func.getArgument(k))])
     )
-    // for (const arg of range(func.getNumArguments()).map((k) => func.getArgument(k))) {
-    //   console.log('arg')
-    //   printAST(arg)
-    // }
 
     if (func.isSetBody()) {
       const body = func.getBody()
-      // console.log('function body for', this.id)
-      // printAST(body)
       this.tree = FromSBMLMath(body, 0, )
     } else {
       throw new Error('No function body')

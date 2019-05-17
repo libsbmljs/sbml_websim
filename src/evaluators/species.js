@@ -26,13 +26,13 @@ export class SpeciesEvaluator extends ComponentEvaluator {
      const convertToConc = (amt) => {
        if (this.compartment === null)
          throw new Error('Cannot convert to conc for species - no compartment set')
-       return new Quotient(amt, evaluator.getTreeForComponent(findComponent(this.compartment), model))
+       return new Quotient(amt, evaluator.getTreeForComponent(findComponent(model, this.compartment), model))
      }
 
      const convertToAmt = (conc) => {
        if (this.compartment === null)
          throw new Error('Cannot convert to amt for species - no compartment set')
-       return new Product(amt, evaluator.getTreeForComponent(findComponent(this.compartment), model))
+       return new Product(amt, evaluator.getTreeForComponent(findComponent(model, this.compartment), model))
      }
 
      const initial_conc = species.isSetInitialConcentration() ? species.getInitialConcentration() : null
@@ -117,7 +117,7 @@ export class SpeciesEvaluator extends ComponentEvaluator {
 
  initialize(evaluator, conc=true) {
    this.value = this.tree.evaluate(evaluator, true, conc)
-   console.log('species initial val', this.id, this.value)
+   // console.log('species initial val', this.id, this.value)
  }
 
  set(value, evaluator, initial=false, conc=true) {

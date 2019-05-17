@@ -293,7 +293,6 @@ export function FromSBMLMath(ast, k=0) {
     case libsbml.AST_FUNCTION:
     case libsbml.AST_CSYMBOL_FUNCTION:
       const fname = ast.getName()
-      console.log('function name', fname)
       const args = range(ast.getNumChildren()).map((k) => FromSBMLMath(getChild(ast, k)))
       return new FunctionCall(fname, args)
     default:
