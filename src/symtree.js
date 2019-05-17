@@ -3,11 +3,9 @@ import math from 'mathjs'
 
 import { getLibsbml } from './libsbml.js'
 
- // base class
-export class SymTree {
-  constructor() {
-  }
-}
+import { SymTree } from './symtrees/base.js'
+
+import { BinaryOperator } from './symtrees/binaryop.js'
 
 export class Constant extends SymTree {
   constructor(value) {
@@ -75,13 +73,6 @@ export class Logarithm extends UnaryOperator {
 
 
 // ** binary ops **
-export class BinaryOperator extends SymTree {
- constructor(lhs, rhs) {
-   super()
-   this.lhs = lhs
-   this.rhs = rhs
- }
-}
 
 export class Product extends BinaryOperator {
  constructor(lhs, rhs) {
@@ -281,7 +272,7 @@ export function FromSBMLMath(ast, k=0) {
     case libsbml.AST_CONSTANT_E:
       return new Constant(2.7182818284)
     case libsbml.AST_CONSTANT_FALSE:
-      return new Constant(0)
+      return new Constant(-1)
     case libsbml.AST_CONSTANT_PI:
       return new Constant(3.14159265359)
     case libsbml.AST_CONSTANT_TRUE:

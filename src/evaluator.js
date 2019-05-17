@@ -5,6 +5,7 @@ import { SpeciesEvaluator } from './evaluators/species.js'
 import { ReactionEvaluator } from './evaluators/reaction.js'
 import { ParameterEvaluator } from './evaluators/parameter.js'
 import { FunctionEvaluator } from './evaluators/function.js'
+import { EventEvaluator } from './evaluators/event.js'
 import { SpeciesRateEvaluator, RateRuleEvaluator } from './evaluators/rate.js'
 
 function isComponentIn(component, components) {
@@ -80,6 +81,12 @@ export class Evaluator {
           const id = func.getId()
           return [id, new FunctionEvaluator(func, this, model)]
         }))
+      // event triggers
+      this.event_trigger_evals = model.events
+        .filter((event) => event.isSetIdAttribute())
+        .map((event) =>
+        new EventEvaluator(event, this, model)
+      )
       // independent rates (non-const species and parameters)
       this.indep_rate_evals = model.species
         .filter((species) => this.evaluators.get(species.getId()).isIndependent())
@@ -185,5 +192,11 @@ export class Evaluator {
     if (!this.function_evaluators.has(id))
       throw new Error('No evaluator for function '+id)
     return this.function_evaluators.get(id).evaluate(this, args, initial, conc)
+  }
+
+  getTriggerStates() {
+    return this.event_trigger_evals.map((trigger) =>
+      trigger.evaluate(this, false, true, null)
+    )
   }
 }

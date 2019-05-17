@@ -1,0 +1,8 @@
+model event_test
+  compartment c = 1
+  var species X in c
+  J0: X -> ; k*X
+  X = 10
+  k = 1
+  at time>5: X = 10
+end
