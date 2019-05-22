@@ -21,6 +21,6 @@ export class Websim {
 
   simulateFor(duration) {
     const t = this.evaluator.getCurrentTime()
-    return this.ode.solve(t, t+duration)
+    return this.ode.solve(t, t+duration, this.evaluator.getTriggerStates())
   }
 }

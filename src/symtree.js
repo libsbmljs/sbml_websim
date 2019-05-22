@@ -5,7 +5,9 @@ import { getLibsbml } from './libsbml.js'
 
 import { SymTree } from './symtrees/base.js'
 
-import { BinaryOperator } from './symtrees/binaryop.js'
+import { Product, Quotient, Sum, Difference, Exponentiation } from './symtrees/binaryop.js'
+export { Product, Quotient, Sum, Difference, Exponentiation } from './symtrees/binaryop.js'
+import { RelationalEqual, RelationalNotEqual, RelationalLT, RelationalLTE, RelationalGT, RelationalGTE } from './symtrees/relational.js'
 
 export class Constant extends SymTree {
   constructor(value) {
@@ -68,65 +70,6 @@ export class Logarithm extends UnaryOperator {
 
  evaluate(evaluator, initial=false, conc=true, bvars=null) {
    return Math.log(this.operand.evaluate(evaluator, initial, conc, bvars))
- }
-}
-
-
-// ** binary ops **
-
-export class Product extends BinaryOperator {
- constructor(lhs, rhs) {
-   super(lhs, rhs)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return this.lhs.evaluate(evaluator, initial, conc, bvars) *
-          this.rhs.evaluate(evaluator, initial, conc, bvars)
- }
-}
-
-export class Quotient extends BinaryOperator {
- constructor(lhs, rhs) {
-   super(lhs, rhs)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return this.lhs.evaluate(evaluator, initial, conc, bvars) /
-          this.rhs.evaluate(evaluator, initial, conc, bvars)
- }
-}
-
-export class Sum extends BinaryOperator {
- constructor(lhs, rhs) {
-   super(lhs, rhs)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return this.lhs.evaluate(evaluator, initial, conc, bvars) +
-          this.rhs.evaluate(evaluator, initial, conc, bvars)
- }
-}
-
-export class Difference extends BinaryOperator {
- constructor(lhs, rhs) {
-   super(lhs, rhs)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return this.lhs.evaluate(evaluator, initial, conc, bvars) -
-          this.rhs.evaluate(evaluator, initial, conc, bvars)
- }
-}
-
-export class Exponentiation extends BinaryOperator {
- constructor(lhs, rhs) {
-   super(lhs, rhs)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return Math.pow(
-          this.lhs.evaluate(evaluator, initial, conc, bvars),
-          this.rhs.evaluate(evaluator, initial, conc, bvars))
  }
 }
 
@@ -277,6 +220,19 @@ export function FromSBMLMath(ast, k=0) {
       return new Constant(3.14159265359)
     case libsbml.AST_CONSTANT_TRUE:
       return new Constant(1)
+
+    case libsbml.AST_RELATIONAL_EQ:
+      return new RelationalEqual(FromSBMLMath(getChild(ast,0)), FromSBMLMath(getChild(ast,1)))
+    case libsbml.AST_RELATIONAL_NEQ:
+      return new RelationalNotEqual(FromSBMLMath(getChild(ast,0)), FromSBMLMath(getChild(ast,1)))
+    case libsbml.AST_RELATIONAL_LT:
+      return new RelationalLT(FromSBMLMath(getChild(ast,0)), FromSBMLMath(getChild(ast,1)))
+    case libsbml.AST_RELATIONAL_LEQ:
+      return new RelationalLTE(FromSBMLMath(getChild(ast,0)), FromSBMLMath(getChild(ast,1)))
+    case libsbml.AST_RELATIONAL_GT:
+      return new RelationalGT(FromSBMLMath(getChild(ast,0)), FromSBMLMath(getChild(ast,1)))
+    case libsbml.AST_RELATIONAL_GEQ:
+      return new RelationalGTE(FromSBMLMath(getChild(ast,0)), FromSBMLMath(getChild(ast,1)))
 
     case libsbml.AST_FUNCTION_LN:
       return new Logarithm(FromSBMLMath(getChild(ast,0)))

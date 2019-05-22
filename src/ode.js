@@ -8,7 +8,7 @@ export class ODE {
   constructor(evaluator) {
     this.evaluator = evaluator
     this.solver = new Solver(evaluator.getNumIndepVars())
-    this.event_threshold
+    this.event_threshold = 0.001
   }
 
   setAbsoluteTolerance(value) {
@@ -34,12 +34,12 @@ export class ODE {
   solve(t_start, t_end, trigger_state=null) {
     this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
     if (trigger_state !== null) {
-      if (didTriggerChange(trigger_state)) {
+      if (this.didTriggerChange(trigger_state)) {
         // trigger occurred in interval
         // find the time when the trigger occurred
-        bisect(t_start - t_end, trigger_state)
+        this.bisect(t_start - t_end, trigger_state)
         // finish
-        solve(
+        this.solve(
           this.evaluator.getCurrentTime(),
           t_end,
           this.evaluator.getTriggerStates()
@@ -50,16 +50,19 @@ export class ODE {
   }
 
   bisect(h, trigger_state) {
+    console.log('bisect', h)
     const t_start = this.evaluator.getCurrentTime()
     const t_end = t_start+h
     this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
-    const next_h = didTriggerChange(trigger_state) ? -Math.abs(h)/2 : Math.abs(h)/2
+    const next_h = this.didTriggerChange(trigger_state) ? -Math.abs(h)/2 : Math.abs(h)/2
     // if (Math.abs(next_h) < this.event_threshold) {
     if (Math.abs(h) < this.event_threshold) {
       if (next_h > 0)
         // advance past the trigger
         this.solver.solve(this.f.bind(this), t_end, this.evaluator.getIndepInitialVals(), t_end+h)
       console.log('event triggered at', this.evaluator.getCurrentTime())
+    } else {
+      this.bisect(next_h, trigger_state)
     }
   }
 
