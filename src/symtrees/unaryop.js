@@ -5,6 +5,10 @@ export class UnaryOperator extends SymTree {
    super()
    this.operand = operand
  }
+
+ dependencies() {
+   return Array.concat(this.operand.dependencies())
+ }
 }
 
 // ** unary ops **

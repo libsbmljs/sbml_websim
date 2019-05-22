@@ -6,6 +6,10 @@ export class BinaryOperator extends SymTree {
    this.lhs = lhs
    this.rhs = rhs
  }
+
+ dependencies() {
+   return Array.concat(this.lhs.dependencies(), this.rhs.dependencies())
+ }
 }
 
 // ** binary ops **

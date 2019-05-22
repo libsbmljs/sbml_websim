@@ -20,6 +20,10 @@ export class Constant extends SymTree {
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return this.value
   }
+
+  dependencies() {
+    return []
+  }
 }
 
 export class Symbol extends SymTree {
@@ -35,6 +39,10 @@ export class Symbol extends SymTree {
     else
       return evaluator.evaluate(this.symbol, initial, conc, bvars)
   }
+
+  dependencies() {
+    return [this.symbol]
+  }
 }
 
 export class Time extends SymTree {
@@ -44,6 +52,10 @@ export class Time extends SymTree {
 
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return evaluator.getCurrentTime()
+  }
+
+  dependencies() {
+    return ['time']
   }
 }
 
@@ -62,6 +74,10 @@ export class FunctionCall extends SymTree {
      this.args.map((a) => a.evaluate(evaluator, initial, conc, bvars)),
      initial,
      conc)
+ }
+
+ dependencies() {
+   return this.args.map((a) => a.dependencies())
  }
 }
 
