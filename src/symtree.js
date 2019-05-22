@@ -5,6 +5,8 @@ import { getLibsbml } from './libsbml.js'
 
 import { SymTree } from './symtrees/base.js'
 
+import { Negation, Logarithm } from './symtrees/unaryop.js'
+export { Negation, Logarithm } from './symtrees/unaryop.js'
 import { Product, Quotient, Sum, Difference, Exponentiation } from './symtrees/binaryop.js'
 export { Product, Quotient, Sum, Difference, Exponentiation } from './symtrees/binaryop.js'
 import { RelationalEqual, RelationalNotEqual, RelationalLT, RelationalLTE, RelationalGT, RelationalGTE } from './symtrees/relational.js'
@@ -43,34 +45,6 @@ export class Time extends SymTree {
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return evaluator.getCurrentTime()
   }
-}
-
-// ** unary ops **
-export class UnaryOperator extends SymTree {
- constructor(operand) {
-   super()
-   this.operand = operand
- }
-}
-
-export class Negation extends UnaryOperator {
- constructor(operand) {
-   super(operand)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return -this.operand.evaluate(evaluator, initial, conc, bvars)
- }
-}
-
-export class Logarithm extends UnaryOperator {
- constructor(operand) {
-   super(operand)
- }
-
- evaluate(evaluator, initial=false, conc=true, bvars=null) {
-   return Math.log(this.operand.evaluate(evaluator, initial, conc, bvars))
- }
 }
 
 
