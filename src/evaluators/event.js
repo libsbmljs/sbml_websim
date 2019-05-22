@@ -14,7 +14,7 @@ function decodeArg(ast) {
   }
 }
 
- // *** Function ***
+ // *** Event ***
 export class EventEvaluator extends ComponentEvaluator {
   constructor(event, evaluator, model) {
     if (!event.isSetIdAttribute())
@@ -44,7 +44,7 @@ export class EventEvaluator extends ComponentEvaluator {
     return this.tree.evaluate(evaluator, initial, conc, bvars)
   }
 
-  executeEventAssignments(evaluator, conc=true) {
+  applyEventAssignments(evaluator, conc=true) {
     for (const [id,tree] of this.assignments) {
       evaluator.setValue(
         id,

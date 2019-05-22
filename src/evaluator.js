@@ -82,7 +82,7 @@ export class Evaluator {
           return [id, new FunctionEvaluator(func, this, model)]
         }))
       // event triggers
-      this.event_trigger_evals = model.events
+      this.event_evals = model.events
         .filter((event) => event.isSetIdAttribute())
         .map((event) =>
         new EventEvaluator(event, this, model)
@@ -195,8 +195,16 @@ export class Evaluator {
   }
 
   getTriggerStates() {
-    return this.event_trigger_evals.map((trigger) =>
+    return this.event_evals.map((trigger) =>
       trigger.evaluate(this, false, true, null)
     )
+  }
+
+  applyEventAssignments(trigger_state) {
+    for (const [k,t] of trigger_state.entries()) {
+      if (t > 1) {
+        this.event_evals[k].applyEventAssignments(this, true)
+      }
+    }
   }
 }
