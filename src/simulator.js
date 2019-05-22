@@ -1,5 +1,5 @@
 import { Evaluator } from './evaluator.js'
-import { ODE } from './ode.js'
+import { ODE, sign } from './ode.js'
 
 export class Websim {
   constructor(doc) {
@@ -21,6 +21,6 @@ export class Websim {
 
   simulateFor(duration) {
     const t = this.evaluator.getCurrentTime()
-    return this.ode.solve(t, t+duration, this.evaluator.getTriggerStates())
+    return this.ode.solve(t, t+duration, this.evaluator.getTriggerStates().map((v) => sign(v)))
   }
 }

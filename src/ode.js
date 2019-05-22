@@ -1,8 +1,13 @@
 import { range } from 'lodash'
 import { Solver } from 'odex'
-import { sign } from 'mathjs'
+import { sign as signjs } from 'mathjs'
 
 // https://stackoverflow.com/questions/4852017/how-to-initialize-an-arrays-length-in-javascript
+
+export function sign(v) {
+  const r = signjs(v)
+  return r === 0 ? 1 : r
+}
 
 export class ODE {
   constructor(evaluator) {
@@ -37,7 +42,7 @@ export class ODE {
       if (this.didTriggerChange(trigger_state)) {
         // trigger occurred in interval
         // find the time when the trigger occurred
-        this.bisect(t_start - t_end, trigger_state)
+        this.bisect((t_start - t_end)/2, trigger_state)
         // finish
         this.solve(
           this.evaluator.getCurrentTime(),
@@ -77,11 +82,4 @@ export class ODE {
     return this.evaluator.calcIndepRates()
   }
 
-  // calcReactionRates() {
-  //   // https://stackoverflow.com/questions/5349425/whats-the-fastest-way-to-loop-through-an-array-in-javascript
-  //   for(var k=0, N=this.reaction_ids.length; k<N; k++) {
-  //     this.reaction_rates[k] = this.evaluator.evaluate(this.reaction_ids[k], false, true)
-  //     console.log('reaction rate', this.reaction_ids[k], this.reaction_rates[k])
-  //   }
-  // }
 }
