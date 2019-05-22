@@ -28,7 +28,7 @@ export class ODE {
     this.event_threshold = value
   }
 
-  didTriggerChange(trigger_state) {
+  _didTriggerChange(trigger_state) {
     const signed_triggers = this.evaluator.getTriggerStates()
       .map((v) => sign(v))
     const difference = signed_triggers
@@ -36,21 +36,36 @@ export class ODE {
     return difference.some((d) => d !== 0)
   }
 
+  _rootfind(trigger_state, n,x0,x1,y) {
+    if (this._didTriggerChange(trigger_state)) {
+      // trigger occurred in interval
+      // find the time when the trigger occurred
+      this.bisect((x0 - x1)/2, trigger_state)
+      // finish
+      this.solve(
+        this.evaluator.getCurrentTime(),
+        x1,
+        this.evaluator.getTriggerStates()
+          .map((v) => sign(v))
+      )
+    }
+  }
+
   solve(t_start, t_end, trigger_state=null) {
-    this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
     if (trigger_state !== null) {
-      if (this.didTriggerChange(trigger_state)) {
-        // trigger occurred in interval
-        // find the time when the trigger occurred
-        this.bisect((t_start - t_end)/2, trigger_state)
-        // finish
-        this.solve(
-          this.evaluator.getCurrentTime(),
-          t_end,
-          this.evaluator.getTriggerStates()
-            .map((v) => sign(v))
-        )
-      }
+      this.solver.solve(
+        this.f.bind(this),
+        t_start,
+        this.evaluator.getIndepInitialVals(),
+        t_end,
+        this._rootfind.bind(this, trigger_state)
+      )
+    } else {
+      this.solver.solve(
+        this.f.bind(this),
+        t_start,
+        this.evaluator.getIndepInitialVals(),
+        t_end)
     }
   }
 
@@ -58,12 +73,12 @@ export class ODE {
     const t_start = this.evaluator.getCurrentTime()
     const t_end = t_start+h
     this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
-    const next_h = this.didTriggerChange(trigger_state) ? -Math.abs(h)/2 : Math.abs(h)/2
+    const next_h = this._didTriggerChange(trigger_state) ? -Math.abs(h)/2 : Math.abs(h)/2
     if (Math.abs(h) < this.event_threshold) {
       if (next_h > 0)
         // advance past the trigger
         this.solver.solve(this.f.bind(this), t_end, this.evaluator.getIndepInitialVals(), t_end+h)
-      // console.log('event triggered at', this.evaluator.getCurrentTime())
+      console.log('event triggered at', this.evaluator.getCurrentTime())
       this.evaluator.applyEventAssignments(
         this.evaluator.getTriggerStates().map((v) => sign(v))
       )
