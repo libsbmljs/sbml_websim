@@ -28,29 +28,6 @@ export class ODE {
     this.event_threshold = value
   }
 
-  _didTriggerChange(trigger_state) {
-    const signed_triggers = this.evaluator.getTriggerStates()
-      .map((v) => sign(v))
-    const difference = signed_triggers
-      .map((v,k) => (v-trigger_state[k]))
-    return difference.some((d) => d !== 0)
-  }
-
-  _rootfind(trigger_state, n,x0,x1,y) {
-    if (this._didTriggerChange(trigger_state)) {
-      // trigger occurred in interval
-      // find the time when the trigger occurred
-      this.bisect((x0 - x1)/2, trigger_state)
-      // finish
-      this.solve(
-        this.evaluator.getCurrentTime(),
-        x1,
-        this.evaluator.getTriggerStates()
-          .map((v) => sign(v))
-      )
-    }
-  }
-
   solve(t_start, t_end, trigger_state=null) {
     if (trigger_state !== null) {
       this.solver.solve(
@@ -69,7 +46,30 @@ export class ODE {
     }
   }
 
-  bisect(h, trigger_state) {
+  _didTriggerChange(trigger_state) {
+    const signed_triggers = this.evaluator.getTriggerStates()
+      .map((v) => sign(v))
+    const difference = signed_triggers
+      .map((v,k) => (v-trigger_state[k]))
+    return difference.some((d) => d !== 0)
+  }
+
+  _rootfind(trigger_state, n,x0,x1,y) {
+    if (this._didTriggerChange(trigger_state)) {
+      // trigger occurred in interval
+      // find the time when the trigger occurred
+      this._bisect((x0 - x1)/2, trigger_state)
+      // finish
+      this.solve(
+        this.evaluator.getCurrentTime(),
+        x1,
+        this.evaluator.getTriggerStates()
+          .map((v) => sign(v))
+      )
+    }
+  }
+
+  _bisect(h, trigger_state) {
     const t_start = this.evaluator.getCurrentTime()
     const t_end = t_start+h
     this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
@@ -78,12 +78,12 @@ export class ODE {
       if (next_h > 0)
         // advance past the trigger
         this.solver.solve(this.f.bind(this), t_end, this.evaluator.getIndepInitialVals(), t_end+h)
-      console.log('event triggered at', this.evaluator.getCurrentTime())
+      // console.log('event triggered at', this.evaluator.getCurrentTime())
       this.evaluator.applyEventAssignments(
         this.evaluator.getTriggerStates().map((v) => sign(v))
       )
     } else {
-      this.bisect(next_h, trigger_state)
+      this._bisect(next_h, trigger_state)
     }
   }
 
