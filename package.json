@@ -49,6 +49,7 @@
     "libsbmljs_stable": "^5.18.0-beta1",
     "lodash": "^4.17.11",
     "mathjs": "^5.10.0",
-    "odex": "^2.0.4"
+    "odex": "^2.0.4",
+    "tinyqueue": "^2.0.2"
   }
 }
