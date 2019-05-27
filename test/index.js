@@ -288,4 +288,41 @@ describe('Main', function () {
       console.log(error.stack)
     }
   })
+
+  it('Tests stochastic simulation', (done) => {
+    try {
+      loadFromURL('http://localhost:9876/base/models/event_test.xml', true).then((sim) => {
+        try {
+          // initial reaction rates
+          expect(sim.evaluator.evaluate('J0', true, true)).toBe(10)
+
+          // initial species values
+          expect(sim.evaluator.evaluate('X', true, true)).toBe(10)
+
+          // initial rates
+          expect(sim.evaluator.evaluateIndepRate('X',  true, true)).toBe(-10)
+
+          // test results of simulation
+          // before event
+          sim.simulateTo(4)
+          console.log('X at 4', sim.evaluator.evaluate('X', false, true))
+          // expect(sim.evaluator.evaluate('X', false, true)).toBeCloseTo(0.2, 1)
+          // after event
+          sim.simulateTo(6)
+          console.log('X at 6', sim.evaluator.evaluate('X', false, true))
+          // expect(sim.evaluator.evaluate('X', false, true)).toBeCloseTo(3.7, 1)
+        } catch(error) {
+          fail(error)
+          console.log(error.stack)
+        } finally {
+          done()
+        }
+      }, (err) => {
+        fail('Unable to load model')
+      })
+    } catch(error) {
+      fail(error)
+      console.log(error.stack)
+    }
+  })
 })

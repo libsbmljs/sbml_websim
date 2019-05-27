@@ -1,4 +1,6 @@
-import { dexp } from 'probability-distributions'
+import { range } from 'lodash'
+// import prob from 'probability-distributions'
+
 import { sign } from './ode.js'
 
 export class GibsonProcess {
@@ -6,10 +8,10 @@ export class GibsonProcess {
     this.reaction_evaluator = reaction_evaluator
     this.dependencies = reaction_evaluator.tree.dependencies()
     this.next_t = null
-    this.reactant_ids =
-      reaction.getNumReactants()).map((k) => reaction.getReactant(k).getSpecies())
-    this.product_ids  =
-      reaction.getNumProducts()).map((k) => reaction.getProduct(k).getSpecies())
+    this.reactant_ids = range(reaction.getNumReactants())
+      .map((k) => reaction.getReactant(k).getSpecies())
+    this.product_ids  = range(reaction.getNumProducts())
+      .map((k) => reaction.getProduct(k).getSpecies())
     this.initialize(evaluator)
   }
 
@@ -17,7 +19,7 @@ export class GibsonProcess {
     const p = this.reaction_evaluator.evaluateNow(evaluator, false, true, null)
     this.last_t = evaluator.getCurrentTime()
     this.p_old = p
-    this.next_t = dexp(p) + evaluator.getCurrentTime()
+    this.next_t = -Math.log(Math.random())/p + evaluator.getCurrentTime()
   }
 
   update(evaluator) {
@@ -55,10 +57,10 @@ export class GibsonProcess {
   }
 
   apply(evaluator) {
-    for (id of this.reactant_ids)
-      evaluator.setValue(evaluator.evaluate(id, false, false)-1, false, false)
-    for (id of this.product_ids)
-      evaluator.setValue(evaluator.evaluate(id, false, false)+1, false, false)
+    for (const id of this.reactant_ids)
+      evaluator.setValue(id, evaluator.evaluate(id, false, false)-1, false, false)
+    for (const id of this.product_ids)
+      evaluator.setValue(id, evaluator.evaluate(id, false, false)+1, false, false)
     this.initialize(evaluator)
     return this.reactant_ids.concat(this.product_ids)
   }
@@ -70,7 +72,7 @@ export class GibsonSolver {
     this.event_threshold = 0.001
 
     this.queue =
-      model.reactions.map((r) => GibsonProcess(
+      model.reactions.map((r) => new GibsonProcess(
         evaluator.evaluators.get(r.getId()),
         r,
         evaluator
@@ -94,13 +96,14 @@ export class GibsonSolver {
     const r = this.queue[0]
     const t = this.evaluator.getCurrentTime()
     this.evaluator.setCurrentTime(r.nextTime())
+    console.log('rxn at', this.evaluator.getCurrentTime())
 
     // trigger is time-based - bisect
     if (this._didTriggerChange(trigger_state))
       this._bisect((t - this.evaluator.getCurrentTime())/2, trigger_state)
 
     const changed_quantities = r.apply(this.evaluator)
-    for (p of this.queue)
+    for (const p of this.queue)
       p.updateIfChanged(this.evaluator, changed_quantities)
 
     // trigger is state-based - apply immediately
@@ -117,8 +120,13 @@ export class GibsonSolver {
       return
     while (true) {
       const next_t = this.queue[0].nextTime()
-      if (next_t > t)
+      if (next_t > t || next_t === null) {
+        const last_t = this.evaluator.getCurrentTime()
+        this.evaluator.setCurrentTime(t)
+        if (this._didTriggerChange(trigger_state))
+          this._bisect((last_t - t)/2, trigger_state)
         return
+      }
       this.step(trigger_state)
     }
   }

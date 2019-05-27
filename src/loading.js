@@ -1,14 +1,17 @@
 import { libsbml_promise, getLibsbmlReader } from './libsbml.js'
-import { Websim } from './simulator.js'
+import { Websim, WebsimStoch } from './simulator.js'
 
-export function loadFromSBML(sbml) {
+export function loadFromSBML(sbml, stochastic=false) {
   // console.log('start loadFromSBML')
   return libsbml_promise.then(() => {
     // console.log('start loadFromSBML promise')
     // const reader = new getLibsbml().SBMLReader()
     const reader = getLibsbmlReader()
     const doc = reader.readSBMLFromString(sbml)
-    return new Websim(doc)
+    if (!stochastic)
+      return new Websim(doc)
+    else
+      return new WebsimStoch(doc)
   })
 }
 
@@ -17,7 +20,7 @@ export function loadFromSBML(sbml) {
  * @param  {string} url The URL of the SBML file.
  * @return {Promise} A promise that resolves to the simulator instance.
  */
-export function loadFromURL(url) {
+export function loadFromURL(url, stochastic=false) {
   return new Promise((resolve, reject) => {
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url);
@@ -39,7 +42,7 @@ export function loadFromURL(url) {
       });
     };
     xhr.send();
-  }).then((sbml) => loadFromSBML(sbml));
+  }).then((sbml) => loadFromSBML(sbml, stochastic));
 }
 
 /**
@@ -47,8 +50,8 @@ export function loadFromURL(url) {
  * @param  {string} filepath The path to the SBML file.
  * @return {Promise} A promise that resolves to the simulator instance.
  */
-export function loadFromFile(filepath) {
+export function loadFromFile(filepath, stochastic=false) {
   const {promisify} = require('util')
   const fs = require('fs')
-  return promisify(fs.readFile)(filepath).then((bytes) => loadFromSBML(bytes))
+  return promisify(fs.readFile)(filepath).then((bytes) => loadFromSBML(bytes, stochastic))
 }
