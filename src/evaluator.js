@@ -140,6 +140,10 @@ export class Evaluator {
     return this.time
   }
 
+  setCurrentTime(value) {
+    this.time = value
+  }
+
   initialize() {
     for (const [id, evaluator] of this.evaluators) {
       evaluator.initialize(this)

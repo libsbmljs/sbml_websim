@@ -50,7 +50,6 @@
     "lodash": "^4.17.11",
     "mathjs": "^5.10.0",
     "odex": "^2.0.4",
-    "probability-distributions": "^0.9.1",
-    "tinyqueue": "^2.0.2"
+    "probability-distributions": "^0.9.1"
   }
 }
