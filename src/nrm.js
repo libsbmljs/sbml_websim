@@ -1,5 +1,4 @@
 import { range } from 'lodash'
-// import prob from 'probability-distributions'
 
 import { sign } from './ode.js'
 
@@ -19,7 +18,10 @@ export class GibsonProcess {
     const p = this.reaction_evaluator.evaluateNow(evaluator, false, true, null)
     this.last_t = evaluator.getCurrentTime()
     this.p_old = p
-    this.next_t = -Math.log(Math.random())/p + evaluator.getCurrentTime()
+    if (p > 0)
+      this.next_t = -Math.log(Math.random())/p + evaluator.getCurrentTime()
+    else
+      this.next_t = null
   }
 
   update(evaluator) {
@@ -96,7 +98,6 @@ export class GibsonSolver {
     const r = this.queue[0]
     const t = this.evaluator.getCurrentTime()
     this.evaluator.setCurrentTime(r.nextTime())
-    console.log('rxn at', this.evaluator.getCurrentTime())
 
     // trigger is time-based - bisect
     if (this._didTriggerChange(trigger_state))
@@ -112,7 +113,9 @@ export class GibsonSolver {
         this.evaluator.getTriggerStates().map((v) => sign(v))
       )
       this._reinitializeQueue()
-    }
+    } else
+      // queue always needs to be sorted, whether event occurred or not
+      this.queue.sort((u,v) => u.compare(v))
   }
 
   until(t, trigger_state=null) {
@@ -123,8 +126,10 @@ export class GibsonSolver {
       if (next_t > t || next_t === null) {
         const last_t = this.evaluator.getCurrentTime()
         this.evaluator.setCurrentTime(t)
-        if (this._didTriggerChange(trigger_state))
+        if (this._didTriggerChange(trigger_state)) {
           this._bisect((last_t - t)/2, trigger_state)
+          this.until(t, this.evaluator.getTriggerStates().map((v) => sign(v)))
+        }
         return
       }
       this.step(trigger_state)

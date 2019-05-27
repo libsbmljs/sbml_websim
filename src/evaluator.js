@@ -206,7 +206,7 @@ export class Evaluator {
 
   applyEventAssignments(trigger_state) {
     for (const [k,t] of trigger_state.entries()) {
-      if (t > 1) {
+      if (t > 0) {
         this.event_evals[k].applyEventAssignments(this, true)
       }
     }

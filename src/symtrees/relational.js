@@ -33,7 +33,7 @@ export class RelationalLT extends BinaryOperator {
   }
 
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
-    return this.lhs.evaluate(evaluator, initial, conc, bvars) -
+    return -this.lhs.evaluate(evaluator, initial, conc, bvars) +
            this.rhs.evaluate(evaluator, initial, conc, bvars)
   }
 }
@@ -45,7 +45,7 @@ export class RelationalLTE extends BinaryOperator {
 
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return bumpZero(
-           this.lhs.evaluate(evaluator, initial, conc, bvars) -
+           -this.lhs.evaluate(evaluator, initial, conc, bvars) +
            this.rhs.evaluate(evaluator, initial, conc, bvars))
   }
 }
@@ -56,7 +56,7 @@ export class RelationalGT extends BinaryOperator {
   }
 
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
-    return -this.lhs.evaluate(evaluator, initial, conc, bvars) +
+    return this.lhs.evaluate(evaluator, initial, conc, bvars) -
            this.rhs.evaluate(evaluator, initial, conc, bvars)
   }
 }
@@ -68,7 +68,7 @@ export class RelationalGTE extends BinaryOperator {
 
   evaluate(evaluator, initial=false, conc=true, bvars=null) {
     return bumpZero(
-           -this.lhs.evaluate(evaluator, initial, conc, bvars) +
+           this.lhs.evaluate(evaluator, initial, conc, bvars) -
            this.rhs.evaluate(evaluator, initial, conc, bvars))
   }
 }

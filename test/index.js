@@ -305,11 +305,9 @@ describe('Main', function () {
           // test results of simulation
           // before event
           sim.simulateTo(4)
-          console.log('X at 4', sim.evaluator.evaluate('X', false, true))
           // expect(sim.evaluator.evaluate('X', false, true)).toBeCloseTo(0.2, 1)
           // after event
           sim.simulateTo(6)
-          console.log('X at 6', sim.evaluator.evaluate('X', false, true))
           // expect(sim.evaluator.evaluate('X', false, true)).toBeCloseTo(3.7, 1)
         } catch(error) {
           fail(error)

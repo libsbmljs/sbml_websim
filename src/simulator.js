@@ -36,12 +36,7 @@ export class Websim {
 export class WebsimStoch {
   constructor(doc) {
     this.evaluator = new Evaluator(doc)
-    try {
-      this.gibson = new GibsonSolver(this.evaluator, doc.getModel())
-    } catch(error) {
-      console.log(error)
-      throw error
-    }
+    this.gibson = new GibsonSolver(this.evaluator, doc.getModel())
   }
 
   getCurrentTime() {
