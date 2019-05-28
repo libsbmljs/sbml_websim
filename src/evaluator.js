@@ -175,6 +175,10 @@ export class Evaluator {
     return this.indep_rate_evals_map.get(id).evaluate(this, initial, conc)
   }
 
+  getIndepValIds() {
+    return this.indep_rate_evals.map((e) => e.id)
+  }
+
   getNumIndepVars() {
     return this.indep_rate_evals.length
   }

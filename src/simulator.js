@@ -27,6 +27,8 @@ export class Websim {
 
   simulateTo(t_end) {
     const t = this.evaluator.getCurrentTime()
+    if (t_end === t)
+      return
     if (t_end < t)
       throw new Error('simulateTo was called with t_end < current time')
     return this.ode.solve(t, t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
@@ -50,6 +52,8 @@ export class WebsimStoch {
 
   simulateTo(t_end) {
     const t = this.evaluator.getCurrentTime()
+    if (t_end === t)
+      return
     if (t_end < t)
       throw new Error('simulateTo was called with t_end < current time')
     return this.gibson.until(t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
