@@ -4,3 +4,4 @@
 __pycache__
 /sbml_websim
 default.profraw
+/dist
