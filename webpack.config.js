@@ -6,8 +6,11 @@ import CopyPlugin from 'copy-webpack-plugin'
 
 module.exports = env => ({
   entry: './src/index.js',
+  target: 'node',
   output: {
     // https://stackoverflow.com/questions/43209666/react-router-v4-cannot-get-url/43212553
+    library: 'sbml_websim',
+    libraryTarget: 'umd',
     filename: 'sbml_websim.js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/'
