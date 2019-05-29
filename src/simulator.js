@@ -22,7 +22,7 @@ export class Websim {
 
   simulateFor(duration) {
     const t = this.evaluator.getCurrentTime()
-    return this.ode.solve(t, t+duration, this.evaluator.getTriggerStates().map((v) => sign(v)))
+    this.ode.solve(t, t+duration, this.evaluator.getTriggerStates().map((v) => sign(v)))
   }
 
   simulateTo(t_end) {
@@ -31,7 +31,11 @@ export class Websim {
       return
     if (t_end < t)
       throw new Error('simulateTo was called with t_end < current time')
-    return this.ode.solve(0, t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
+    // bug?
+    // console.log('simulateTo', t, 'to', t_end)
+    // console.log('X start', this.evaluator.evaluate('X', false, true))
+    this.ode.solve(t, t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
+    // console.log('X end', this.evaluator.evaluate('X', false, true))
   }
 }
 
@@ -47,7 +51,7 @@ export class WebsimStoch {
 
   simulateFor(duration) {
     const t = this.evaluator.getCurrentTime()
-    return this.gibson.until(t+duration, this.evaluator.getTriggerStates().map((v) => sign(v)))
+    this.gibson.until(t+duration, this.evaluator.getTriggerStates().map((v) => sign(v)))
   }
 
   simulateTo(t_end) {
@@ -56,7 +60,7 @@ export class WebsimStoch {
       return
     if (t_end < t)
       throw new Error('simulateTo was called with t_end < current time')
-    return this.gibson.until(t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
+    this.gibson.until(t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
   }
 
   simulateGrid(t_start, t_end, n_rows) {

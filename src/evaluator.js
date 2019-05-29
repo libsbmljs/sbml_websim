@@ -191,6 +191,10 @@ export class Evaluator {
     return this.indep_rate_evals.map((e) => this.evaluate(e.id, true, true))
   }
 
+  getIndepCurrentVals() {
+    return this.indep_rate_evals.map((e) => this.evaluate(e.id, false, true))
+  }
+
   updateReactionRates() {
     for (const e of this.reaction_evals)
       e.update(this, true)

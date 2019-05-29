@@ -33,7 +33,7 @@ export class ODE {
       this.solver.solve(
         this.f.bind(this),
         t_start,
-        this.evaluator.getIndepInitialVals(),
+        this.evaluator.getIndepCurrentVals(),
         t_end,
         this._rootfind.bind(this, trigger_state)
       )
@@ -41,7 +41,7 @@ export class ODE {
       this.solver.solve(
         this.f.bind(this),
         t_start,
-        this.evaluator.getIndepInitialVals(),
+        this.evaluator.getIndepCurrentVals(),
         t_end)
     }
   }
@@ -90,6 +90,7 @@ export class ODE {
   f(x, y) {
     // TODO: use static var?
     // x = time, y = indep. values
+    // console.log('f, t', x)
     this.evaluator.time = x
     for(var k=0, N=this.evaluator.getNumIndepVars(); k<N; k++)
       this.evaluator.setIndepValue(k, y[k])
