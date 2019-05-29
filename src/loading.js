@@ -2,10 +2,7 @@ import { libsbml_promise, getLibsbmlReader } from './libsbml.js'
 import { Websim, WebsimStoch } from './simulator.js'
 
 export function loadFromSBML(sbml, stochastic=false) {
-  // console.log('start loadFromSBML')
   return libsbml_promise.then(() => {
-    // console.log('start loadFromSBML promise')
-    // const reader = new getLibsbml().SBMLReader()
     const reader = getLibsbmlReader()
     const doc = reader.readSBMLFromString(sbml)
     if (!stochastic)
