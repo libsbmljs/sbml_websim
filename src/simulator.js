@@ -32,8 +32,6 @@ export class Websim {
         return
       if (t_end < t)
         throw new Error('simulateTo was called with t_end < current time')
-      // bug?
-      console.log('simulateTo', t, 'to', t_end)
       this.ode.solve(t, t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
     } catch(error) {
       console.log(error)

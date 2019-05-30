@@ -82,12 +82,12 @@ export class ODE {
   _bisect(h, trigger_state) {
     const t_start = this.evaluator.getCurrentTime()
     const t_end = t_start+h
-    this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepInitialVals(), t_end)
+    this.solver.solve(this.f.bind(this), t_start, this.evaluator.getIndepCurrentVals(), t_end)
     const next_h = this._didTriggerChange(trigger_state) ? -Math.abs(h)/2 : Math.abs(h)/2
     if (Math.abs(h) < this.event_threshold) {
       if (next_h > 0)
         // advance past the trigger
-        this.solver.solve(this.f.bind(this), t_end, this.evaluator.getIndepInitialVals(), t_end+h)
+        this.solver.solve(this.f.bind(this), t_end, this.evaluator.getIndepCurrentVals(), t_end+h)
       // console.log('event triggered at', this.evaluator.getCurrentTime())
       this.evaluator.applyEventAssignments(
         this.evaluator.getTriggerStates().map((v) => sign(v))
