@@ -103,6 +103,13 @@ export class Evaluator {
         .map((compartment) =>
         new RateRuleEvaluator(compartment, this, model)
       ))
+
+      this.output_ids = this.indep_rate_evals.map((e) => e.id).concat(
+        model.species
+          .filter((species) => !this.evaluators.get(species.getId()).isIndependent())
+          .map((species) => species.getId())
+      )
+
       this.indep_rate_evals_map = new Map(this.indep_rate_evals.map((e) => [e.id, e]))
       this.initialize()
     } catch(error) {
@@ -177,6 +184,10 @@ export class Evaluator {
 
   getIndepValIds() {
     return this.indep_rate_evals.map((e) => e.id)
+  }
+
+  getOutputIds() {
+    return this.output_ids
   }
 
   getNumIndepVars() {

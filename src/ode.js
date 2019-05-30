@@ -14,10 +14,20 @@ export class ODE {
     this.evaluator = evaluator
     this.solver = new Solver(evaluator.getNumIndepVars())
     this.event_threshold = 0.001
+    // this.solver.absoluteTolerance = 1e-16
+    // this.solver.relativeTolerance = 1e-16
+  }
+
+  getAbsoluteTolerance(value) {
+    return this.solver.absoluteTolerance
   }
 
   setAbsoluteTolerance(value) {
     this.solver.absoluteTolerance = value
+  }
+
+  getRelativeTolerance(value) {
+    return this.solver.relativeTolerance
   }
 
   setRelativeTolerance(value) {
@@ -91,6 +101,8 @@ export class ODE {
     // TODO: use static var?
     // x = time, y = indep. values
     // console.log('f, t', x)
+    if (isNaN(x))
+      throw new Error('Simulation divergence near t='+this.evaluator.time.toString())
     this.evaluator.time = x
     for(var k=0, N=this.evaluator.getNumIndepVars(); k<N; k++)
       this.evaluator.setIndepValue(k, y[k])

@@ -26,16 +26,19 @@ export class Websim {
   }
 
   simulateTo(t_end) {
-    const t = this.evaluator.getCurrentTime()
-    if (t_end === t)
-      return
-    if (t_end < t)
-      throw new Error('simulateTo was called with t_end < current time')
-    // bug?
-    // console.log('simulateTo', t, 'to', t_end)
-    // console.log('X start', this.evaluator.evaluate('X', false, true))
-    this.ode.solve(t, t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
-    // console.log('X end', this.evaluator.evaluate('X', false, true))
+    try {
+      const t = this.evaluator.getCurrentTime()
+      if (t_end === t)
+        return
+      if (t_end < t)
+        throw new Error('simulateTo was called with t_end < current time')
+      // bug?
+      console.log('simulateTo', t, 'to', t_end)
+      this.ode.solve(t, t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
+    } catch(error) {
+      console.log(error)
+      throw error
+    }
   }
 }
 

@@ -1,8 +1,11 @@
 import { BinaryOperator } from './binaryop.js'
 
 function bumpZero(v) {
+  return v
   if (v === 0)
     return 0.0001
+  else
+    return v
 }
 
 export class RelationalEqual extends BinaryOperator {

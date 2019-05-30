@@ -132,6 +132,6 @@ export class SpeciesEvaluator extends ComponentEvaluator {
  }
 
  isIndependent() {
-   return !this.is_const && !this.is_boundary
+   return !this.is_const && !this.is_boundary && !this.has_rule
  }
 }
