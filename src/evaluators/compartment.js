@@ -7,6 +7,8 @@ export class CompartmentEvaluator extends ComponentEvaluator {
     if (!compartment.isSetIdAttribute())
       throw new Error('No id set for compartment')
     super(compartment.getId())
+    if (compartment.isSetName())
+      this.name = compartment.getName()
 
     this.is_const = !compartment.isSetConstant() || compartment.getConstant()
     if (this.is_const){

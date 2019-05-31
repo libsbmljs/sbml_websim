@@ -109,6 +109,11 @@ export class Evaluator {
           .filter((species) => !this.evaluators.get(species.getId()).isIndependent())
           .map((species) => species.getId())
       )
+      this.output_names = this.indep_rate_evals.map((e) => e.getName()).concat(
+        model.species
+          .filter((species) => !this.evaluators.get(species.getId()).isIndependent())
+          .map((species) => (species.isSetName() ? species.getName() : species.getId()))
+      )
 
       this.indep_rate_evals_map = new Map(this.indep_rate_evals.map((e) => [e.id, e]))
       this.initialize()
@@ -188,6 +193,10 @@ export class Evaluator {
 
   getOutputIds() {
     return this.output_ids
+  }
+
+  getOutputNames() {
+    return this.output_names
   }
 
   getNumIndepVars() {

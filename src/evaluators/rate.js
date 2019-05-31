@@ -37,6 +37,14 @@ function appendToTree(newtree, tree, invert=false) {
 export class RateEvaluator extends EvaluatorBase {
   constructor() {
     super()
+    this.name = null
+  }
+
+  getName() {
+    if (this.name !== null)
+      return this.name
+    else
+      return this.id
   }
 
   evaluate(evaluator, initial=false, conc=true, bvars = null) {

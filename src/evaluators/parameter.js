@@ -7,6 +7,8 @@ export class ParameterEvaluator extends ComponentEvaluator {
     if (!parameter.isSetIdAttribute())
       throw new Error('No id set for parameter')
     super(parameter.getId())
+    if (parameter.isSetName())
+      this.name = parameter.getName()
 
     for (const rule of model.rules) {
       if (rule.isAssignment() && rule.isSetVariable() &&

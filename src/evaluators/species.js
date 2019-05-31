@@ -16,6 +16,8 @@ export class SpeciesEvaluator extends ComponentEvaluator {
      if (!species.isSetIdAttribute())
        throw new Error('No id set for compartment')
      super(species.getId())
+     if (species.isSetName())
+       this.name = species.getName()
 
      this.compartment = species.isSetCompartment() ? species.getCompartment() : null
      this.is_const = species.isSetConstant() && species.getConstant()

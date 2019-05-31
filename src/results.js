@@ -3,15 +3,15 @@ import { range } from 'lodash'
 
 export function makePlotlyGrid(sim, time_start, time_stop, num_timepoints, is_stochastic, num_replicates, enable_mean_trace) {
   try {
-    const results = sim.evaluator.getOutputIds().map((id) => ({
+    const results = sim.evaluator.getOutputNames().map((name) => ({
       x: [],
       y: [],
       type: 'scatter',
       mode: 'lines',
-      name: id,
+      name: name,
     }))
     range(num_timepoints).map((k) => {
-      const t = time_start + ((k+1)/num_timepoints)*(time_stop-time_start)
+      const t = time_start + ((k)/(num_timepoints-1))*(time_stop-time_start)
       sim.simulateTo(t)
       Array.from(sim.evaluator.getOutputIds().entries()).map(([l,id]) => {
         results[l].x.push(t)
