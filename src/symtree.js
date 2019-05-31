@@ -95,6 +95,8 @@ function astNameToString(t) {
       return 'AST_POWER'
     case libsbml.AST_FUNCTION_POWER:
       return 'AST_FUNCTION_POWER'
+    case libsbml.AST_FUNCTION_ROOT:
+      return 'AST_FUNCTION_ROOT'
     case libsbml.AST_INTEGER:
       return 'AST_INTEGER'
     case libsbml.AST_REAL:
@@ -191,6 +193,10 @@ export function FromSBMLMath(ast, k=0) {
         return new Exponentiation(FromSBMLMath(getChild(ast, k)), FromSBMLMath(getChild(ast, k+1)))
       else
         return new Exponentiation(FromSBMLMath(getChild(ast, k)), FromSBMLMath(ast, k+1))
+    case libsbml.AST_FUNCTION_ROOT:
+        return new Exponentiation(FromSBMLMath(getChild(ast, k+1)), new Quotient(new Constant(1), FromSBMLMath(getChild(ast, k))))
+    case libsbml.AST_FUNCTION_EXP:
+        return new Exponentiation(new Constant(Math.E), FromSBMLMath(getChild(ast, k)))
     case libsbml.AST_INTEGER:
     case libsbml.AST_REAL:
     case libsbml.AST_REAL_E:
