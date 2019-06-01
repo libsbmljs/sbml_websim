@@ -41,9 +41,9 @@ export class Websim {
 }
 
 export class WebsimStoch {
-  constructor(doc) {
+  constructor(doc, stochastic_inc) {
     this.evaluator = new Evaluator(doc)
-    this.gibson = new GibsonSolver(this.evaluator, doc.getModel())
+    this.gibson = new GibsonSolver(this.evaluator, doc.getModel(), stochastic_inc)
   }
 
   getCurrentTime() {
@@ -57,10 +57,8 @@ export class WebsimStoch {
 
   simulateTo(t_end) {
     const t = this.evaluator.getCurrentTime()
-    if (t_end === t)
+    if (t_end <= t)
       return
-    if (t_end < t)
-      throw new Error('simulateTo was called with t_end < current time')
     this.gibson.until(t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
   }
 
