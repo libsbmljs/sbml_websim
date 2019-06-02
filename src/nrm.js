@@ -14,7 +14,7 @@ export class GibsonProcess {
     this.reaction_evaluator = reaction_evaluator
     this.dependencies = reaction_evaluator.tree.dependencies()
     this.increment = increment
-    console.log('gibson process', this.reaction_evaluator.id, 'increment', increment)
+    // console.log('gibson process', this.reaction_evaluator.id, 'increment', increment)
     this.next_t = null
     this.reactant_ids = range(reaction.getNumReactants())
       .map((k) => reaction.getReactant(k).getSpecies())
@@ -52,7 +52,10 @@ export class GibsonProcess {
     } else {
       this.last_t = t
       this.p_old = p
-      this.next_t = -Math.log(Math.random())/p + t
+      if (p !== 0)
+        this.next_t = -Math.log(Math.random())/p + t
+      else
+        this.next_t = null
     }
   }
 
