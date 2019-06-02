@@ -33,6 +33,8 @@ function makePlotlyGridMulti(sim, time_start, time_stop, num_timepoints, is_stoc
     name: name,
   }))
   for (const k of range(num_replicates)) {
+    sim.resetToInitial()
+    console.log('rep',k,'of',num_replicates, sim.gibson.queue.map((p) => [p.reaction_evaluator.id, p.next_t]))
     populatePlotlyGridResults(results, sim, time_start, time_stop, num_timepoints)
     // make gap
     Array.from(sim.evaluator.getOutputIds().entries()).map(([l,id]) => {

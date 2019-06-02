@@ -38,6 +38,10 @@ export class Websim {
       throw error
     }
   }
+
+  resetToInitial() {
+    this.evaluator.resetToInitial()
+  }
 }
 
 export class WebsimStoch {
@@ -62,6 +66,11 @@ export class WebsimStoch {
     this.gibson.until(t_end, this.evaluator.getTriggerStates().map((v) => sign(v)))
   }
 
-  simulateGrid(t_start, t_end, n_rows) {
+  // simulateGrid(t_start, t_end, n_rows) {
+  // }
+
+  resetToInitial() {
+    this.evaluator.resetToInitial()
+    this.gibson.reinitialize()
   }
 }

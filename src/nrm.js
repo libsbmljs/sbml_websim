@@ -104,6 +104,11 @@ export class GibsonSolver {
       p.initialize(this.evaluator)
   }
 
+  reinitialize() {
+    this._reinitializeQueue()
+    this.queue.sort((u,v) => u.compare(v))
+  }
+
   setEventThreshold(value) {
     this.event_threshold = value
   }
@@ -114,7 +119,7 @@ export class GibsonSolver {
     const r = this.queue[0]
     const t = this.evaluator.getCurrentTime()
     this.evaluator.setCurrentTime(r.nextTime())
-    console.log('reaction', r.reaction_evaluator.id, 'occurred at', this.evaluator.getCurrentTime())
+    // console.log('reaction', r.reaction_evaluator.id, 'occurred at', this.evaluator.getCurrentTime())
 
     // trigger is time-based - bisect
     if (this._didTriggerChange(trigger_state))
@@ -140,10 +145,10 @@ export class GibsonSolver {
       return
     while (true) {
       const next_t = this.queue[0].nextTime()
-      console.log('until next time', next_t)
+      // console.log('until next time', next_t)
       // console.log(new Map(this.queue.map((p) => [p.reaction_evaluator.id, p.next_t])))
-      console.log(this.queue.map((p) => [p.reaction_evaluator.id, p.next_t]))
-      console.log('current vals', this.evaluator.getIndepCurrentVals())
+      // console.log(this.queue.map((p) => [p.reaction_evaluator.id, p.next_t]))
+      // console.log('current vals', this.evaluator.getIndepCurrentVals())
       if (next_t > t || next_t === null) {
         const last_t = this.evaluator.getCurrentTime()
         this.evaluator.setCurrentTime(t)

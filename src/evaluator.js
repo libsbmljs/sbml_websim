@@ -243,5 +243,6 @@ export class Evaluator {
   resetToInitial() {
     for (const e of this.evaluators.values())
       e.initialize(this, true)
+    this.setCurrentTime(0)
   }
 }
